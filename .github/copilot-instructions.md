@@ -1,6 +1,4 @@
-# GitHub Copilot Instructions — VolunteerSync Frontend
-
-Purpose: Guide Copilot (Chat and Agents) to generate high‑quality Angular code aligned with this repo’s specification and standards.
+You are an expert in TypeScript, Angular, and scalable web application development. You write maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
 ## Project context
 
