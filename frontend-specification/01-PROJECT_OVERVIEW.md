@@ -32,18 +32,17 @@ To create an intuitive, responsive, and accessible web application that simplifi
 
 ### 2.1 Core Framework
 
-- **Framework**: Angular 17+ (Latest LTS)
-- **Language**: TypeScript 5.0+
-- **Package Manager**: npm or yarn
-- **Build Tool**: Angular CLI with Vite
+- **Framework**: Angular v20
+- **Package Manager**: bun
 
 ### 2.2 UI Components & Styling
 
-- **Design System**: Angular Material 17+
-- **CSS Framework**: Angular Flex Layout / Angular CDK Layout
+- **Design System**: Angular Material v20
+- **CSS Framework**: Tailwind CSS v4
+- **Component Library**: Angular Material v20 components with Tailwind styling
 - **Icons**: Material Icons / Heroicons
-- **Typography**: Custom design tokens based on Material Design 3
-- **Theming**: Angular Material theming with custom palette
+- **Typography**: Tailwind Typography plugin with Material Design 3 tokens
+- **Theming**: Angular Material v20 theming integrated with Tailwind custom properties
 
 ### 2.3 State Management & Data Flow
 
@@ -58,6 +57,7 @@ To create an intuitive, responsive, and accessible web application that simplifi
 ### 2.4 Development & Build Tools
 
 - **Development Server**: Angular CLI Dev Server
+- **CSS Processing**: Tailwind CSS
 - **Testing Framework**:
   - Unit Tests: Jest
   - E2E Tests: Cypress
@@ -65,9 +65,9 @@ To create an intuitive, responsive, and accessible web application that simplifi
 - **Code Quality**:
   - ESLint + Angular ESLint
   - Prettier
+  - Stylelint (for custom CSS)
   - Husky (Git hooks)
 - **CI/CD**: GitHub Actions
-- **Bundle Analysis**: webpack-bundle-analyzer
 
 ---
 
@@ -90,7 +90,11 @@ src/
 │   └── graphql/             # GraphQL queries, mutations, fragments
 ├── assets/                  # Static assets
 ├── environments/            # Environment configurations
-└── styles/                  # Global styles and themes
+└── styles/                  # Global styles, Tailwind config, and Material themes
+    ├── base/               # Tailwind base styles and resets
+    ├── components/         # Custom component styles
+    ├── utilities/          # Custom Tailwind utilities
+    └── themes/             # Material Design theme integration
 ```
 
 ### 3.2 Module Architecture
@@ -117,13 +121,7 @@ src/
 - **Cumulative Layout Shift (CLS)**: < 0.1
 - **Time to Interactive (TTI)**: < 3.5s
 
-### 4.2 Bundle Size Targets
-
-- **Main Bundle**: < 500KB (gzipped)
-- **Feature Bundles**: < 200KB each (gzipped)
-- **Total Initial Load**: < 1MB (gzipped)
-
-### 4.3 GraphQL Performance
+### 4.2 GraphQL Performance
 
 - **Query Response Time**: < 200ms (95th percentile)
 - **Cache Hit Ratio**: > 80% for repeated queries
@@ -135,22 +133,21 @@ src/
 
 ### 5.1 Design Philosophy
 
-- **Mobile-First**: Responsive design starting from mobile viewport
-- **Accessibility**: WCAG 2.1 AA compliance
+- **Mobile-First**: Tailwind's responsive design utilities starting from mobile viewport
 - **Progressive Enhancement**: Core functionality available without JavaScript
 - **Offline Capability**: Service Worker for basic offline functionality
 
 ### 5.2 Interaction Patterns
 
-- **Loading States**: Skeleton screens and progressive loading
+- **Loading States**: Skeleton screens and progressive loading with Tailwind animations
 - **Error Handling**: Graceful error boundaries with recovery actions
-- **Feedback**: Immediate user feedback for all interactions
+- **Feedback**: Immediate user feedback using Material v20 components and Tailwind transitions
 - **Navigation**: Intuitive navigation with breadcrumbs and clear hierarchy
 
 ### 5.3 Content Strategy
 
 - **Progressive Disclosure**: Information hierarchy with expanding details
-- **Contextual Help**: In-line help and tooltips
+- **Contextual Help**: In-line help and tooltips using Angular Material v20
 - **Search & Discovery**: Powerful search with filters and recommendations
 - **Personalization**: Customized experience based on user preferences
 
@@ -181,66 +178,50 @@ src/
 
 ---
 
-## 7. Browser Support
+## 7. Development Workflow
 
-### 7.1 Supported Browsers
-
-- **Chrome**: Last 2 versions
-- **Firefox**: Last 2 versions
-- **Safari**: Last 2 versions
-- **Edge**: Last 2 versions
-- **Mobile Browsers**: iOS Safari, Chrome Mobile
-
-### 7.2 Progressive Enhancement
-
-- **Core Features**: Available in all supported browsers
-- **Enhanced Features**: Modern browser features with graceful fallbacks
-- **Polyfills**: Minimal polyfills for essential functionality
-
----
-
-## 8. Development Workflow
-
-### 8.1 Code Standards
+### 7.1 Code Standards
 
 - **Angular Style Guide**: Official Angular style guide compliance
 - **TypeScript Strict Mode**: Enabled for type safety
 - **Component Architecture**: Smart/dumb component pattern
 - **Service Layer**: Business logic separation in services
+- **Tailwind Standards**: Utility-first approach with component extraction when needed
 
-### 8.2 Testing Strategy
+### 7.2 Testing Strategy
 
 - **Unit Testing**: 90%+ code coverage
 - **Integration Testing**: Critical user flows
 - **E2E Testing**: Complete user journeys
 - **Performance Testing**: Core Web Vitals monitoring
+- **Visual Regression**: Automated screenshot testing for UI consistency
 
-### 8.3 Deployment Pipeline
+### 7.3 Deployment Pipeline
 
-- **Development**: Hot reload with live GraphQL endpoint
+- **Development**: Hot reload with live GraphQL endpoint and Tailwind JIT
 - **Staging**: Production-like environment for testing
-- **Production**: Optimized build with CDN distribution
+- **Production**: Optimized build with CDN distribution and CSS purging
 - **Monitoring**: Real-time performance and error tracking
 
 ---
 
-## 9. Integration Points
+## 8. Integration Points
 
-### 9.1 Backend Integration
+### 8.1 Backend Integration
 
 - **GraphQL API**: Primary data interface
 - **WebSocket**: Real-time updates and notifications
 - **File Upload**: Direct file upload to cloud storage
 - **Authentication**: JWT token exchange
 
-### 9.2 Third-Party Services
+### 8.2 Third-Party Services
 
 - **Google Maps**: Location services and mapping
 - **Google OAuth**: Social authentication
 - **Email Services**: Notification delivery status
 - **Analytics**: User behavior tracking (privacy-compliant)
 
-### 9.3 Future Integrations
+### 8.3 Future Integrations
 
 - **Mobile Apps**: Shared authentication and data models
 - **Calendar Services**: Event synchronization
@@ -249,23 +230,24 @@ src/
 
 ---
 
-## 10. Success Metrics
+## 9. Success Metrics
 
-### 10.1 User Engagement
+### 9 .1 User Engagement
 
 - **Time on Site**: Average session duration > 5 minutes
 - **Page Views**: Average pages per session > 3
 - **Return Visitors**: > 60% returning user rate
 - **Task Completion**: > 95% successful event registration
 
-### 10.2 Performance Metrics
+### 9.2 Performance Metrics
 
 - **Page Load Speed**: < 3 seconds on 3G networks
 - **Error Rate**: < 0.1% JavaScript errors
 - **Uptime**: > 99.9% availability
 - **Search Performance**: Results displayed < 500ms
+- **CSS Bundle Size**: Tailwind CSS optimized to < 50KB
 
-### 10.3 Business Metrics
+### 9.3 Business Metrics
 
 - **User Registration**: Month-over-month growth
 - **Event Creation**: Active organizer engagement

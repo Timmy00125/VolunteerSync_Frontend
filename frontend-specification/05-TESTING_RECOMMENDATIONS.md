@@ -26,7 +26,6 @@ The VolunteerSync frontend testing strategy follows the **Testing Pyramid** prin
 - **Integration Test Coverage**: Minimum 80% for API interactions
 - **E2E Test Coverage**: 100% of critical user paths
 - **Performance Tests**: Core Web Vitals compliance
-- **Accessibility Tests**: WCAG 2.1 AA compliance
 
 ### 1.3 Testing Tools Stack
 
@@ -36,7 +35,6 @@ The VolunteerSync frontend testing strategy follows the **Testing Pyramid** prin
 - **E2E Testing**: Cypress
 - **Visual Regression**: Percy or Chromatic
 - **Performance Testing**: Lighthouse CI
-- **Accessibility Testing**: axe-core + Pa11y
 
 ---
 
@@ -148,7 +146,6 @@ describe("EventCardComponent", () => {
 - [ ] **State Management**: Component state changes work correctly
 - [ ] **Event Emission**: Output events are emitted with correct data
 - [ ] **Error Handling**: Component handles invalid/missing data gracefully
-- [ ] **Accessibility**: ARIA attributes and keyboard navigation work
 
 ### 2.2 Service Testing
 
@@ -566,7 +563,6 @@ ci:
   assert:
     assertions:
       "categories:performance": ["warn", { minScore: 90 }]
-      "categories:accessibility": ["error", { minScore: 95 }]
       "categories:best-practices": ["warn", { minScore: 90 }]
       "categories:seo": ["warn", { minScore: 90 }]
   upload:
@@ -576,71 +572,9 @@ ci:
 
 ---
 
-## 5. Accessibility Testing
+## 5. Visual Regression Testing
 
-### 5.1 Automated Accessibility Testing
-
-**Scope**: WCAG 2.1 AA compliance  
-**Coverage Target**: 100% of components
-
-#### axe-core Integration
-
-```typescript
-// accessibility.spec.ts
-import { axe, toHaveNoViolations } from "jest-axe";
-
-expect.extend(toHaveNoViolations);
-
-describe("Accessibility Tests", () => {
-  it("should have no accessibility violations on events page", async () => {
-    // Given
-    const fixture = TestBed.createComponent(EventsPageComponent);
-    fixture.componentInstance.events = mockEventsData;
-    fixture.detectChanges();
-
-    // When
-    const results = await axe(fixture.nativeElement);
-
-    // Then
-    expect(results).toHaveNoViolations();
-  });
-
-  it("should be navigable with keyboard only", () => {
-    // Test keyboard navigation
-    const fixture = TestBed.createComponent(EventCardComponent);
-    fixture.detectChanges();
-
-    const element = fixture.nativeElement;
-    const firstFocusable = element.querySelector('[tabindex="0"]');
-
-    firstFocusable.focus();
-    expect(document.activeElement).toBe(firstFocusable);
-
-    // Simulate tab navigation
-    firstFocusable.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab" }));
-    // Verify focus moved correctly
-  });
-});
-```
-
-### 5.2 Screen Reader Testing
-
-**Scope**: Screen reader compatibility
-
-#### Screen Reader Test Checklist
-
-- [ ] **Semantic HTML**: Proper heading hierarchy and landmarks
-- [ ] **ARIA Labels**: All interactive elements have appropriate labels
-- [ ] **Focus Management**: Focus moves logically through the interface
-- [ ] **Announcements**: Dynamic content changes are announced
-- [ ] **Form Labels**: All form inputs have associated labels
-- [ ] **Error Messages**: Errors are announced and properly associated
-
----
-
-## 6. Visual Regression Testing
-
-### 6.1 Component Visual Tests
+### 5.1 Component Visual Tests
 
 **Scope**: UI consistency across changes
 
@@ -670,9 +604,9 @@ describe("Visual Regression Tests", () => {
 
 ---
 
-## 7. Security Testing
+## 6. Security Testing
 
-### 7.1 Frontend Security Tests
+### 6.1 Frontend Security Tests
 
 **Scope**: Client-side security vulnerabilities
 
@@ -703,9 +637,9 @@ describe("Security Tests", () => {
 
 ---
 
-## 8. API Contract Testing
+## 7. API Contract Testing
 
-### 8.1 GraphQL Schema Testing
+### 7.1 GraphQL Schema Testing
 
 **Scope**: API contract validation
 
@@ -746,9 +680,9 @@ describe("GraphQL Contract Tests", () => {
 
 ---
 
-## 9. Test Data Management
+## 8. Test Data Management
 
-### 9.1 Mock Data Strategy
+### 8.1 Mock Data Strategy
 
 **Scope**: Consistent test data across all test types
 
@@ -794,7 +728,7 @@ export class MockDataFactory {
 }
 ```
 
-### 9.2 Test Environment Setup
+### 8.2 Test Environment Setup
 
 ```typescript
 // test-setup.ts
@@ -824,9 +758,9 @@ global.IntersectionObserver = jest.fn().mockImplementation(() => ({
 
 ---
 
-## 10. Continuous Integration Testing
+## 9. Continuous Integration Testing
 
-### 10.1 CI/CD Pipeline Testing
+### 9.1 CI/CD Pipeline Testing
 
 **Scope**: Automated testing in CI/CD pipeline
 
@@ -880,29 +814,21 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage/lcov.info
-
-  accessibility:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run Pa11y accessibility tests
-        run: npm run test:a11y
 ```
 
-### 10.2 Quality Gates
+### 9.2 Quality Gates
 
 - **Code Coverage**: Minimum 90% for unit tests
 - **Build Success**: All builds must pass
 - **Lint Compliance**: Zero ESLint errors
 - **Security Scan**: No high/critical vulnerabilities
 - **Performance Budget**: Bundle size within limits
-- **Accessibility**: Zero axe-core violations
 
 ---
 
-## 11. Test Reporting and Monitoring
+## 10. Test Reporting and Monitoring
 
-### 11.1 Test Reports
+### 10.1 Test Reports
 
 ```typescript
 // jest.config.js
@@ -950,7 +876,6 @@ module.exports = {
 - [ ] Complete unit tests for all components and services
 - [ ] Implement GraphQL integration tests
 - [ ] Create E2E tests for critical user journeys
-- [ ] Set up accessibility testing automation
 
 ### Phase 3: Advanced Testing (Weeks 7-8)
 
