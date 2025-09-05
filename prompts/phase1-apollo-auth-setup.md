@@ -29,13 +29,13 @@ You are implementing the VolunteerSync MVP with Angular 20, standalone component
 2. **Create Apollo Client service** using Angular CLI:
 
    ```bash
-   ng generate service shared/services/apollo
+   ng generate service shared/services/apollo --skip-tests=false
    ```
 
 3. **Create authentication service** using Angular CLI:
 
    ```bash
-   ng generate service auth/services/auth
+   ng generate service auth/services/auth --skip-tests=false
    ```
 
 4. **Create GraphQL type definitions and operations structure**:
