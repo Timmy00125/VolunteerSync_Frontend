@@ -431,7 +431,7 @@ async loadEvents(): Promise<void> {
 
 ### Technical Requirements
 
-- Use Angular Material components for consistent UI
+- Use Tailwind CSS for consistent UI
 - Implement proper TypeScript typing for all services
 - Add comprehensive unit tests for validators and services
 - Use signals for reactive state management

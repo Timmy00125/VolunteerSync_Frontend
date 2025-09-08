@@ -97,7 +97,7 @@ This directory contains detailed implementation prompts for the VolunteerSync MV
 
 ## 🚀 Getting Started
 
-**Prerequisites:** Angular CLI, Node.js, Angular Material, and TailwindCSS are already installed.
+**Prerequisites:** Angular CLI, Node.js, and TailwindCSS are already installed.
 
 1. **Start with Phase 1:** Begin with routing foundation and work through each prompt sequentially
 2. **Use Angular CLI:** Each prompt specifies when to use `ng generate` commands
@@ -121,8 +121,8 @@ Each prompt includes:
 - **Framework:** Angular 20 with standalone components
 - **State Management:** Signals and RxJS
 - **Data Layer:** Apollo Client with GraphQL
-- **UI Library:** Angular Material
-- **Styling:** Custom theme with TailwindCSS utilities
+- **UI Library:** Tailwind CSS
+- **Styling:** Tailwind CSS
 - **Testing:** Jest for unit tests, Cypress for E2E
 - **Type Safety:** TypeScript 5+ with strict mode
 
@@ -165,7 +165,6 @@ src/app/
 - [Architecture Specifications](../spec/)
 - [Angular 20 Documentation](https://angular.io/docs)
 - [Apollo Angular Documentation](https://apollo-angular.com/docs/)
-- [Angular Material Documentation](https://material.angular.io/)
 
 ---
 

@@ -14,7 +14,7 @@ You are implementing Phase 2 event UI components. The event data layer, GraphQL 
 ### Requirements
 
 - Use Angular 20 standalone components with signals
-- Implement with Angular Material for consistent UI
+- Implement with Tailwind CSS for consistent UI
 - Integrate with existing event service
 - Add real-time updates with GraphQL subscriptions
 - Follow responsive design principles
@@ -44,7 +44,7 @@ You are implementing Phase 2 event UI components. The event data layer, GraphQL 
 
 **Features to implement:**
 
-- Display paginated list of events using Angular Material cards
+- Display paginated list of events using cards styled with Tailwind CSS
 - Filter events by status, date, location
 - Search functionality by title/description
 - Sort options (date, title, registration count)
@@ -90,11 +90,11 @@ export class EventListComponent {
 
 **Template features:**
 
-- Angular Material data table or card grid
-- Search bar with mat-form-field
+- A data table or card grid styled with Tailwind CSS
+- Search bar with an input styled with Tailwind CSS
 - Filter chips for event status
 - Sort dropdown
-- Pagination with mat-paginator
+- Pagination with custom pagination components styled with Tailwind CSS
 - Loading spinner
 - Empty state messaging
 
@@ -224,8 +224,8 @@ export class EventFormComponent implements OnInit {
 
 **Template features:**
 
-- Angular Material form fields
-- Date/time pickers (mat-datepicker)
+- HTML form fields styled with Tailwind CSS
+- Date/time pickers (e.g., a native picker or a custom one styled with Tailwind CSS)
 - Rich text editor for description (future)
 - Capacity input with validation
 - Form actions (save, cancel, delete)
@@ -256,7 +256,7 @@ export class EventFormComponent implements OnInit {
 
 - Reusable confirmation dialog
 - Configurable title, message, and actions
-- Angular Material dialog implementation
+- Custom dialog implementation with Tailwind CSS
 
 **Loading Spinner Component:**
 
@@ -268,7 +268,7 @@ export class EventFormComponent implements OnInit {
 
 - Use Angular Reactive Forms with proper validation
 - Implement OnPush change detection strategy
-- Use Angular Material components consistently
+- Use Tailwind CSS utility classes consistently
 - Add proper ARIA labels and accessibility features
 - Handle all async operations with loading states
 - Implement proper error handling and user feedback

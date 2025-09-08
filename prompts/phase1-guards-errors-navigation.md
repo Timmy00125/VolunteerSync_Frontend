@@ -14,7 +14,7 @@ You are implementing the final pieces of Phase 1: authentication guards, error h
 
 - Implement route guards using Angular 20 patterns
 - Create comprehensive error handling for GraphQL operations
-- Build responsive navigation header with Angular Material
+- Build responsive navigation header with Tailwind CSS
 - Use signals and modern Angular features
 
 ### Implementation Instructions
@@ -46,7 +46,7 @@ You are implementing the final pieces of Phase 1: authentication guards, error h
    ```
 
 5. **Update Shared Header Component** (already generated, now implement):
-   - Responsive navigation with Angular Material toolbar
+   - Responsive navigation with a `nav` element styled with Tailwind CSS
    - User menu with profile and logout options
    - Role-based navigation items
    - Mobile-friendly hamburger menu
@@ -123,7 +123,7 @@ export class ErrorHandlerService {
 
 **Features to implement:**
 
-- Toast notifications using Angular Material snackbar
+- Toast notifications using a custom snackbar/toast component styled with Tailwind CSS
 - Different notification types (success, error, warning, info)
 - Configurable duration and actions
 - Queue management for multiple notifications
@@ -141,7 +141,7 @@ export class NotificationService {
 
 **Features to implement:**
 
-- Responsive Angular Material toolbar
+- Responsive toolbar styled with Tailwind CSS
 - User avatar and menu (using AuthService)
 - Navigation items based on user role
 - Mobile hamburger menu with slide-out navigation
@@ -171,7 +171,7 @@ export class NotificationService {
 - Use OnPush change detection strategy
 - Proper TypeScript typing throughout
 - Integration with existing services
-- Responsive design with Angular Material
+- Responsive design with Tailwind CSS
 - Accessibility features (ARIA labels, keyboard navigation)
 - Unit tests for all services and guards
 

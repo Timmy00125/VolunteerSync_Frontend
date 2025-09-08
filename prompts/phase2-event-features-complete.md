@@ -203,28 +203,10 @@ export class OrganizerDashboardComponent implements OnInit {
 
 **Create Breakpoint Service:**
 
-```typescript
-export class BreakpointService {
-  private breakpointObserver = inject(BreakpointObserver);
+For responsive design, we will rely on Tailwind CSS's built-in responsive utilities. You can apply classes conditionally based on breakpoints (e.g., `md:text-lg`, `lg:flex`).
 
-  // Observables for different breakpoints
-  isHandset$ = this.breakpointObserver.observe(Breakpoints.Handset);
-  isTablet$ = this.breakpointObserver.observe(Breakpoints.Tablet);
-  isDesktop$ = this.breakpointObserver.observe([
-    Breakpoints.Large,
-    Breakpoints.XLarge,
-  ]);
+If you need to programmatically check for breakpoints in your component's logic, you can create a simple service that listens to `window.resize` events and checks the `window.innerWidth` against Tailwind's default breakpoints. However, it is recommended to handle responsiveness primarily through CSS classes.
 
-  // Signals for reactive components
-  isHandset = signal(false);
-  isTablet = signal(false);
-  isDesktop = signal(true);
-
-  constructor() {
-    // Initialize signals based on current breakpoint
-  }
-}
-```
 
 **Responsive design updates:**
 
@@ -256,7 +238,7 @@ export class BreakpointService {
 
 **CSS/SCSS improvements:**
 
-- Angular Material responsive breakpoints
+- Tailwind CSS responsive breakpoints
 - Flexbox and Grid layouts
 - Mobile-first CSS approach
 - Touch-friendly button sizes
@@ -264,7 +246,7 @@ export class BreakpointService {
 
 ### Technical Requirements
 
-- Use Angular CDK Layout module for breakpoint detection
+- Use Tailwind CSS classes for breakpoint-specific styles
 - Implement proper error boundaries
 - Use GraphQL subscriptions efficiently
 - Optimize for mobile performance

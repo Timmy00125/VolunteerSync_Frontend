@@ -14,7 +14,7 @@ You are implementing the VolunteerSync MVP authentication UI components. The Apo
 
 - Use Angular 20 standalone components with signals
 - Implement reactive forms with validation
-- Use Angular Material for UI components
+- Use Tailwind CSS for UI components
 - Integrate with existing authentication service
 - Follow Angular best practices and accessibility guidelines
 
@@ -36,7 +36,7 @@ You are implementing the VolunteerSync MVP authentication UI components. The Apo
    - Add GraphQL login mutation integration
    - Handle loading states and error messages
    - Redirect to dashboard on successful login
-   - Use Angular Material form components (mat-form-field, mat-input, mat-button)
+   - Use standard HTML form elements styled with Tailwind CSS.
 
 4. **Update Registration Component** (`src/app/auth/register/register.component.ts`):
 
@@ -100,7 +100,7 @@ You are implementing the VolunteerSync MVP authentication UI components. The Apo
 
 - Use Angular Reactive Forms with FormBuilder
 - Implement proper TypeScript typing for all forms
-- Use Angular Material components consistently
+- Use Tailwind CSS utility classes consistently
 - Add loading spinners during GraphQL operations
 - Implement proper error handling and user feedback
 - Use signals for component state management
@@ -110,7 +110,7 @@ You are implementing the VolunteerSync MVP authentication UI components. The Apo
 
 ### UI/UX Requirements
 
-- Clean, professional design using Angular Material
+- Clean, professional design using Tailwind CSS
 - Responsive layout for mobile and desktop
 - Loading states for all async operations
 - Clear error messages for validation failures
@@ -122,10 +122,10 @@ You are implementing the VolunteerSync MVP authentication UI components. The Apo
 
 Each component should include:
 
-- Angular Material form components
+- HTML form components styled with Tailwind CSS
 - Proper validation error display
-- Loading states (mat-spinner)
-- Success/error notifications (mat-snackbar)
+- Loading states (e.g., a custom spinner component)
+- Success/error notifications (e.g., a custom notification component)
 - Navigation links between auth forms
 - Responsive layout with proper spacing
 
@@ -147,7 +147,7 @@ Each component should include:
 
 - Use the existing AuthService for all GraphQL operations
 - Integrate with Angular Router for navigation
-- Use Angular Material theming and components
+- Use Tailwind CSS for styling
 - Connect to validation service for reusable validators
 
 ### Success Criteria

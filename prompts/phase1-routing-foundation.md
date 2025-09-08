@@ -2,7 +2,7 @@
 
 ## Context
 
-You are implementing the VolunteerSync MVP using Angular 20 with standalone components, Apollo Client for GraphQL, and Angular Material. The project foundation and Angular Material setup are already complete.
+You are implementing the VolunteerSync MVP using Angular 20 with standalone components, Apollo Client for GraphQL, and Tailwind CSS. The project foundation and Tailwind CSS setup are already complete.
 
 ## Task: TASK-004 - Create routing structure for main application areas
 
@@ -72,7 +72,7 @@ You are implementing the VolunteerSync MVP using Angular 20 with standalone comp
 
 - Use `loadChildren` for lazy loading
 - Ensure all routes are properly typed
-- Follow Angular Material design patterns
+- Follow good design patterns with Tailwind CSS
 - Implement proper route parameters for dynamic routes (event ID, etc.)
 - Use Angular 20 standalone components (no modules)
 

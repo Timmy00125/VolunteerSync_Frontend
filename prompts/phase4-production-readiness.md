@@ -270,13 +270,21 @@ export class ErrorBoundaryService {
 @Component({
   selector: "app-error-fallback",
   template: `
-    <div class="error-fallback" role="alert">
-      <mat-icon>error_outline</mat-icon>
-      <h3>{{ title }}</h3>
-      <p>{{ message }}</p>
-      <button mat-raised-button color="primary" (click)="onRetry()">
-        {{ retryLabel }}
-      </button>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <div class="flex">
+        <div class="py-1">
+          <svg class="fill-current h-6 w-6 text-red-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm-1-5v-4h2v4h-2zm0-6h2v2h-2V7z"/></svg>
+        </div>
+        <div>
+          <h3 class="font-bold">{{ title }}</h3>
+          <p class="text-sm">{{ message }}</p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded" (click)="onRetry()">
+          {{ retryLabel }}
+        </button>
+      </div>
     </div>
   `,
 })

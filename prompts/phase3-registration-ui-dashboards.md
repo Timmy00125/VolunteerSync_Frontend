@@ -376,7 +376,7 @@ export class DashboardService {
 
 ### Technical Requirements
 
-- Use Angular Material data tables for registration lists
+- Use tables styled with Tailwind CSS for registration lists
 - Implement proper pagination for large datasets
 - Use signals for reactive state management
 - Add real-time updates via GraphQL subscriptions
@@ -389,7 +389,7 @@ export class DashboardService {
 
 - Responsive design for mobile and desktop
 - Clear visual hierarchy and information architecture
-- Consistent use of Angular Material components
+- Consistent use of Tailwind CSS
 - Loading states for all async operations
 - Success/error feedback for all actions
 - Intuitive navigation and user flows
