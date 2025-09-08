@@ -7,5 +7,5 @@ export const environment = {
   /**
    * Absolute GraphQL endpoint used by Apollo client
    */
-  graphqlUri: 'http://0.0.0.0:8081/graphql' as const,
+  graphqlUri: 'http://localhost:8081/graphql' as const,
 } as const;
