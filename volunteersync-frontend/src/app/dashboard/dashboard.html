@@ -1,0 +1,57 @@
+<div class="min-h-screen bg-gray-50">
+  <nav class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <h1 class="text-xl font-semibold text-gray-900">VolunteerSync Dashboard</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          @if (currentUser()) {
+          <span class="text-sm text-gray-700">
+            Welcome, {{ currentUser()!.firstName }} {{ currentUser()!.lastName }}
+          </span>
+          <button
+            (click)="onLogout()"
+            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+          >
+            Logout
+          </button>
+          }
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+      <div
+        class="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center"
+      >
+        <div class="text-center">
+          <svg
+            class="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">Authentication Complete!</h3>
+          <p class="mt-1 text-sm text-gray-500">
+            You have successfully logged in to VolunteerSync.
+          </p>
+          <div class="mt-4">
+            <p class="text-sm text-gray-600">
+              Dashboard features will be implemented in the next phase.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
