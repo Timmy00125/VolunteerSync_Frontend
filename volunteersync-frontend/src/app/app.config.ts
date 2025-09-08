@@ -18,6 +18,7 @@ import { InMemoryCache, NormalizedCacheObject, from } from '@apollo/client/core'
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { Router } from '@angular/router';
+import { environment } from '../environments/environment';
 
 // Apollo cache token so we can re-use the same cache instance across SSR and browser
 const APOLLO_CACHE = new InjectionToken<InMemoryCache>('APOLLO_CACHE');
@@ -68,7 +69,7 @@ export const appConfig: ApplicationConfig = {
 
       // HTTP Link
       const httpLinkHandler = httpLink.create({
-        uri: '/graphql',
+        uri: environment.graphqlUri,
         withCredentials: true, // Include cookies for authentication
       });
 
