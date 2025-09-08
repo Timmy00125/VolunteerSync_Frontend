@@ -80,9 +80,7 @@
 
         <!-- Email Field -->
         <div>
-          <label for="email" [class]="validationService.getLabelClasses()">
-            Email address *
-          </label>
+          <label for="email" [class]="validationService.getLabelClasses()"> Email address * </label>
           <input
             id="email"
             name="email"
@@ -101,9 +99,7 @@
 
         <!-- Password Field -->
         <div>
-          <label for="password" [class]="validationService.getLabelClasses()">
-            Password *
-          </label>
+          <label for="password" [class]="validationService.getLabelClasses()"> Password * </label>
           <div class="relative">
             <input
               id="password"
@@ -250,36 +246,7 @@
           }
         </div>
 
-        <!-- Role Selection -->
-        <div>
-          <label [class]="validationService.getLabelClasses()"> I want to join as * </label>
-          <div class="mt-2 space-y-3">
-            @for (role of userRoles; track role.value) {
-            <div class="relative">
-              <input
-                [id]="'role-' + role.value"
-                [value]="role.value"
-                name="role"
-                type="radio"
-                formControlName="role"
-                class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
-              />
-              <label
-                [for]="'role-' + role.value"
-                class="ml-3 block text-sm font-medium text-gray-700 cursor-pointer"
-              >
-                {{ role.label }}
-                <span class="block text-xs text-gray-500 mt-1">{{ role.description }}</span>
-              </label>
-            </div>
-            }
-          </div>
-          @if (shouldShowFieldError('role')) {
-          <p [class]="validationService.getErrorClasses()">
-            {{ getFieldError('role') }}
-          </p>
-          }
-        </div>
+        <!-- Role selection removed to align with backend schema (no role at registration) -->
 
         <!-- Terms and Conditions -->
         <div>
@@ -293,8 +260,14 @@
             />
             <label for="acceptTerms" class="ml-2 block text-sm text-gray-900">
               I accept the
-              <a href="javascript:void(0)" class="text-blue-600 hover:text-blue-500">Terms of Service</a> and
-              <a href="javascript:void(0)" class="text-blue-600 hover:text-blue-500">Privacy Policy</a> *
+              <a href="javascript:void(0)" class="text-blue-600 hover:text-blue-500"
+                >Terms of Service</a
+              >
+              and
+              <a href="javascript:void(0)" class="text-blue-600 hover:text-blue-500"
+                >Privacy Policy</a
+              >
+              *
             </label>
           </div>
           @if (shouldShowFieldError('acceptTerms')) {

@@ -70,7 +70,8 @@ export const appConfig: ApplicationConfig = {
       // HTTP Link
       const httpLinkHandler = httpLink.create({
         uri: environment.graphqlUri,
-        withCredentials: true, // Include cookies for authentication
+        // Use Authorization header; avoid credentials to reduce CORS issues
+        withCredentials: false,
       });
 
       // Authentication link to add JWT token to headers

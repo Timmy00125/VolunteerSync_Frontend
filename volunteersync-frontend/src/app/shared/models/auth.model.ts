@@ -14,9 +14,7 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
-  role?: string;
+  name: string;
 }
 
 export interface RefreshTokenRequest {
@@ -37,12 +35,10 @@ export interface PasswordResetConfirmRequest {
   newPassword: string;
 }
 
-
-
 export interface JwtPayload {
   sub: string; // user id
   email: string;
-  role: string;
+  roles?: string[];
   iat: number;
   exp: number;
 }

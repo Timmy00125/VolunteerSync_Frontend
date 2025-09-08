@@ -1,9 +1,10 @@
 export interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  role: UserRole;
+  name: string;
+  emailVerified: boolean;
+  roles: string[];
+  // Phase 3 optional fields
   profile?: UserProfile;
   createdAt?: string;
   updatedAt?: string;

@@ -1,0 +1,818 @@
+scalar Time
+scalar Upload
+
+type Health {
+  status: String!
+  time: Time!
+}
+
+# Authentication Types
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  emailVerified: Boolean!
+  googleId: String
+  lastLogin: Time
+  createdAt: Time!
+  updatedAt: Time!
+
+  # Phase 3 fields
+  bio: String
+  location: Location
+  profilePicture: String
+  interests: [Interest!]!
+  skills: [Skill!]!
+  roles: [String!]!
+  isVerified: Boolean!
+  joinedAt: Time!
+  lastActiveAt: Time
+  publicProfile: PublicProfile!
+}
+
+type AuthPayload {
+  token: String!
+  refreshToken: String!
+  user: User!
+}
+
+# Event Management - Phase 4
+
+# Core Event Types
+type Event {
+  id: ID!
+  title: String!
+  description: String!
+  shortDescription: String
+  organizer: User!
+  organizerId: ID!
+  status: EventStatus!
+  startTime: Time!
+  endTime: Time!
+  location: EventLocation!
+  capacity: EventCapacity!
+  requirements: EventRequirements!
+  category: EventCategory!
+  timeCommitment: TimeCommitmentType!
+  tags: [String!]!
+  slug: String
+  shareURL: String
+  recurrenceRule: RecurrenceRule
+  registrationSettings: RegistrationSettings!
+  images: [EventImage!]!
+  announcements: [EventAnnouncement!]!
+  createdAt: Time!
+  updatedAt: Time!
+
+  # Computed fields
+  currentRegistrations: Int!
+  availableSpots: Int!
+  isAtCapacity: Boolean!
+  canRegister: Boolean!
+}
+
+type EventLocation {
+  name: String!
+  address: String!
+  city: String!
+  state: String
+  country: String!
+  zipCode: String
+  coordinates: Coordinates
+  instructions: String
+  isRemote: Boolean!
+}
+
+type EventCapacity {
+  minimum: Int!
+  maximum: Int!
+  current: Int!
+  waitlistEnabled: Boolean!
+}
+
+type EventRequirements {
+  minimumAge: Int
+  backgroundCheck: Boolean!
+  physicalRequirements: String
+  skills: [SkillRequirement!]!
+  training: [TrainingRequirement!]!
+  interests: [String!]!
+}
+
+type SkillRequirement {
+  id: ID!
+  skill: String!
+  proficiency: SkillProficiency!
+  required: Boolean!
+}
+
+type TrainingRequirement {
+  id: ID!
+  name: String!
+  description: String
+  required: Boolean!
+  providedByOrganizer: Boolean!
+}
+
+type RecurrenceRule {
+  frequency: RecurrenceFrequency!
+  interval: Int!
+  daysOfWeek: [DayOfWeek!]
+  dayOfMonth: Int
+  endDate: Time
+  occurrenceCount: Int
+}
+
+type RegistrationSettings {
+  opensAt: Time
+  closesAt: Time!
+  requiresApproval: Boolean!
+  allowWaitlist: Boolean!
+  confirmationRequired: Boolean!
+  cancellationDeadline: Time
+}
+
+type EventImage {
+  id: ID!
+  url: String!
+  altText: String
+  isPrimary: Boolean!
+  displayOrder: Int!
+}
+
+type EventAnnouncement {
+  id: ID!
+  title: String!
+  content: String!
+  isUrgent: Boolean!
+  createdAt: Time!
+}
+
+type EventUpdate {
+  id: ID!
+  updatedBy: User!
+  fieldName: String!
+  oldValue: String
+  newValue: String
+  updateType: UpdateType!
+  createdAt: Time!
+}
+
+# Connection Types for Pagination
+type EventConnection {
+  edges: [EventEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type EventEdge {
+  node: Event!
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+# Input Types
+input CreateEventInput {
+  title: String!
+  description: String!
+  shortDescription: String
+  startTime: Time!
+  endTime: Time!
+  location: EventLocationInput!
+  capacity: EventCapacityInput!
+  requirements: EventRequirementsInput
+  tags: [String!]
+  category: EventCategory!
+  timeCommitment: TimeCommitmentType!
+  recurrenceRule: RecurrenceRuleInput
+  registrationSettings: RegistrationSettingsInput!
+}
+
+input UpdateEventInput {
+  title: String
+  description: String
+  shortDescription: String
+  location: EventLocationInput
+  requirements: EventRequirementsInput
+  tags: [String!]
+  category: EventCategory
+}
+
+input EventLocationInput {
+  name: String!
+  address: String!
+  city: String!
+  state: String
+  country: String!
+  zipCode: String
+  coordinates: CoordinatesInput
+  instructions: String
+  isRemote: Boolean!
+}
+
+input CoordinatesInput {
+  lat: Float!
+  lng: Float!
+}
+
+input EventCapacityInput {
+  minimum: Int!
+  maximum: Int!
+  waitlistEnabled: Boolean!
+}
+
+input EventRequirementsInput {
+  minimumAge: Int
+  backgroundCheck: Boolean!
+  physicalRequirements: String
+  skills: [SkillRequirementInput!]
+  training: [TrainingRequirementInput!]
+  interests: [String!]
+}
+
+input SkillRequirementInput {
+  skill: String!
+  proficiency: SkillProficiency!
+  required: Boolean!
+}
+
+input TrainingRequirementInput {
+  name: String!
+  description: String
+  required: Boolean!
+  providedByOrganizer: Boolean!
+}
+
+input RecurrenceRuleInput {
+  frequency: RecurrenceFrequency!
+  interval: Int!
+  daysOfWeek: [DayOfWeek!]
+  dayOfMonth: Int
+  endDate: Time
+  occurrenceCount: Int
+}
+
+input RegistrationSettingsInput {
+  opensAt: Time
+  closesAt: Time!
+  requiresApproval: Boolean!
+  allowWaitlist: Boolean!
+  confirmationRequired: Boolean!
+  cancellationDeadline: Time
+}
+
+input EventSearchFilter {
+  query: String
+  status: [EventStatus!]
+  category: [EventCategory!]
+  timeCommitment: [TimeCommitmentType!]
+  organizerId: ID
+  tags: [String!]
+  startDate: Time
+  endDate: Time
+  location: LocationSearchInput
+  skills: [String!]
+  interests: [String!]
+  requiresBackgroundCheck: Boolean
+  minimumAge: Int
+}
+
+input LocationSearchInput {
+  city: String
+  state: String
+  country: String
+  radius: Float
+  coordinates: CoordinatesInput
+}
+
+input EventSortInput {
+  field: EventSortField!
+  direction: SortDirection!
+}
+
+# Enums
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+  ARCHIVED
+}
+
+enum EventCategory {
+  COMMUNITY_SERVICE
+  ENVIRONMENTAL
+  EDUCATION
+  HEALTH_WELLNESS
+  DISASTER_RELIEF
+  ANIMAL_WELFARE
+  ARTS_CULTURE
+  TECHNOLOGY
+  SPORTS_RECREATION
+  FOOD_HUNGER
+  YOUTH_DEVELOPMENT
+  SENIOR_CARE
+  HOMELESS_SERVICES
+  FUNDRAISING
+  ADVOCACY
+  OTHER
+}
+
+enum TimeCommitmentType {
+  ONE_TIME
+  WEEKLY
+  MONTHLY
+  SEASONAL
+  ONGOING
+}
+
+enum RecurrenceFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum DayOfWeek {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
+
+enum UpdateType {
+  CREATED
+  UPDATED
+  PUBLISHED
+  CANCELLED
+  COMPLETED
+}
+
+enum EventSortField {
+  CREATED_AT
+  START_TIME
+  TITLE
+  CAPACITY
+  REGISTRATION_COUNT
+}
+
+enum SortDirection {
+  ASC
+  DESC
+}
+
+# Phase 3 types
+type PublicProfile {
+  id: ID!
+  name: String!
+  bio: String
+  location: Location
+  profilePicture: String
+  interests: [Interest!]!
+  skills: [Skill!]!
+  volunteerStats: VolunteerStats!
+}
+
+type VolunteerStats {
+  hours: Int!
+  eventsParticipated: Int!
+}
+
+type Interest {
+  id: ID!
+  name: String!
+  category: InterestCategory!
+}
+
+type Skill {
+  id: ID!
+  name: String!
+  proficiency: SkillProficiency!
+  verified: Boolean!
+}
+
+type Location {
+  city: String
+  state: String
+  country: String
+  coordinates: Coordinates
+}
+
+type Coordinates {
+  lat: Float!
+  lng: Float!
+}
+
+type PrivacySettings {
+  profileVisibility: ProfileVisibility!
+  showEmail: Boolean!
+  showLocation: Boolean!
+  allowMessaging: Boolean!
+}
+
+type NotificationPreferences {
+  emailNotifications: Boolean!
+  pushNotifications: Boolean!
+  smsNotifications: Boolean!
+  eventReminders: Boolean!
+  newOpportunities: Boolean!
+  newsletterSubscription: Boolean!
+}
+
+# Input Types
+input RegisterInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input RefreshTokenInput {
+  refreshToken: String!
+}
+
+# Phase 3 inputs
+input UpdateProfileInput {
+  name: String
+  bio: String
+  location: LocationInput
+}
+
+input LocationInput {
+  city: String
+  state: String
+  country: String
+  lat: Float
+  lng: Float
+}
+
+input InterestInput {
+  interestIds: [ID!]!
+}
+
+input SkillInput {
+  name: String!
+  proficiency: SkillProficiency!
+}
+
+input PrivacySettingsInput {
+  profileVisibility: ProfileVisibility
+  showEmail: Boolean
+  showLocation: Boolean
+  allowMessaging: Boolean
+}
+
+input NotificationPreferencesInput {
+  emailNotifications: Boolean
+  pushNotifications: Boolean
+  smsNotifications: Boolean
+  eventReminders: Boolean
+  newOpportunities: Boolean
+  newsletterSubscription: Boolean
+}
+
+input UserSearchFilter {
+  skills: [String!]
+  interests: [ID!]
+  location: LocationInput
+  availability: AvailabilityStatus
+  experience: ExperienceLevel
+}
+
+enum AvailabilityStatus {
+  AVAILABLE
+  BUSY
+  AWAY
+}
+
+enum ExperienceLevel {
+  JUNIOR
+  MID
+  SENIOR
+}
+
+enum ProfileVisibility {
+  PUBLIC
+  VOLUNTEERS_ONLY
+  PRIVATE
+}
+
+enum SkillProficiency {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum InterestCategory {
+  ENVIRONMENT
+  EDUCATION
+  HEALTH
+  COMMUNITY
+  TECHNOLOGY
+  ARTS
+  SPORTS
+  ANIMALS
+}
+
+type Query {
+  health: Health!
+  # Authentication Query
+  me: User
+  # Phase 3 Queries
+  user(id: ID!): PublicProfile
+  searchUsers(
+    filter: UserSearchFilter!
+    limit: Int
+    offset: Int
+  ): [PublicProfile!]!
+  interests: [Interest!]!
+  userActivity: [ActivityLog!]!
+
+  # Event Management Queries - Phase 4
+  event(id: ID!): Event
+  eventBySlug(slug: String!): Event
+  events(
+    filter: EventSearchFilter
+    sort: EventSortInput
+    first: Int
+    after: String
+  ): EventConnection!
+  searchEvents(
+    query: String!
+    filter: EventSearchFilter
+    sort: EventSortInput
+    first: Int
+    after: String
+  ): EventConnection!
+  myEvents(status: [EventStatus!], first: Int, after: String): EventConnection!
+  nearbyEvents(
+    coordinates: CoordinatesInput!
+    radius: Float!
+    filter: EventSearchFilter
+    first: Int
+    after: String
+  ): EventConnection!
+  eventUpdates(eventId: ID!, first: Int, after: String): [EventUpdate!]!
+}
+
+type Mutation {
+  # Authentication Mutations
+  register(input: RegisterInput!): AuthPayload!
+  login(input: LoginInput!): AuthPayload!
+  refreshToken(input: RefreshTokenInput!): AuthPayload!
+  logout: Boolean!
+
+  # Google OAuth URLs and callback
+  googleAuthURL(redirectURL: String!): String!
+  googleCallback(
+    code: String!
+    state: String!
+    redirectURL: String!
+  ): AuthPayload!
+
+  # Phase 3 Mutations
+  updateProfile(input: UpdateProfileInput!): User!
+  uploadProfilePicture(file: Upload!): String!
+  updateInterests(input: InterestInput!): User!
+  addSkill(input: SkillInput!): User!
+  removeSkill(skillId: ID!): User!
+  updatePrivacySettings(input: PrivacySettingsInput!): User!
+  updateNotificationPreferences(input: NotificationPreferencesInput!): User!
+  changePassword(currentPassword: String!, newPassword: String!): Boolean!
+  deactivateAccount(confirmationCode: String!): Boolean!
+  exportUserData: String!
+
+  # Event Management Mutations - Phase 4
+  createEvent(input: CreateEventInput!): Event!
+  updateEvent(id: ID!, input: UpdateEventInput!): Event!
+  publishEvent(id: ID!): Event!
+  cancelEvent(id: ID!, reason: String): Event!
+  deleteEvent(id: ID!): Boolean!
+
+  # Event Images
+  addEventImage(
+    eventId: ID!
+    file: Upload!
+    altText: String
+    isPrimary: Boolean
+  ): EventImage!
+  updateEventImage(
+    id: ID!
+    altText: String
+    isPrimary: Boolean
+    displayOrder: Int
+  ): EventImage!
+  deleteEventImage(id: ID!): Boolean!
+
+  # Event Announcements
+  createEventAnnouncement(
+    eventId: ID!
+    title: String!
+    content: String!
+    isUrgent: Boolean
+  ): EventAnnouncement!
+  updateEventAnnouncement(
+    id: ID!
+    title: String
+    content: String
+    isUrgent: Boolean
+  ): EventAnnouncement!
+  deleteEventAnnouncement(id: ID!): Boolean!
+
+  # Registration mutations
+  registerForEvent(input: RegisterForEventInput!): Registration!
+  bulkRegister(input: BulkRegistrationInput!): [Registration!]!
+  cancelRegistration(registrationId: ID!, reason: String): Registration!
+  approveRegistration(input: ApprovalDecisionInput!): Registration!
+  checkInVolunteer(input: AttendanceInput!): AttendanceRecord!
+  markAttendance(input: AttendanceInput!): AttendanceRecord!
+  promoteFromWaitlist(registrationId: ID!): Registration!
+  transferRegistration(registrationId: ID!, newEventId: ID!): Registration!
+  updateRegistration(
+    registrationId: ID!
+    personalMessage: String
+  ): Registration!
+}
+
+# Registration Types
+type Registration {
+  id: ID!
+  user: User!
+  event: Event!
+  status: RegistrationStatus!
+  personalMessage: String
+  skills: [UserSkill!]!
+  interests: [Interest!]!
+  appliedAt: DateTime!
+  confirmedAt: DateTime
+  cancelledAt: DateTime
+  checkedInAt: DateTime
+  completedAt: DateTime
+  waitlistPosition: Int
+  approvalNotes: String
+  cancellationReason: String
+  attendanceStatus: AttendanceStatus!
+  canCancel: Boolean!
+  canCheckIn: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type WaitlistEntry {
+  id: ID!
+  registration: Registration!
+  position: Int!
+  estimatedPromotionTime: DateTime
+  promotionOfferedAt: DateTime
+  promotionExpiresAt: DateTime
+  autoPromote: Boolean!
+}
+
+type RegistrationConflict {
+  conflictingEvent: Event!
+  conflictType: ConflictType!
+  severity: ConflictSeverity!
+  suggestions: [Event!]!
+}
+
+type AttendanceRecord {
+  registration: Registration!
+  checkedInAt: DateTime
+  checkedInBy: User
+  notes: String
+}
+
+# Input Types
+input RegisterForEventInput {
+  eventId: ID!
+  personalMessage: String
+  emergencyContact: EmergencyContactInput
+  dietaryRestrictions: String
+  accessibilityNeeds: String
+}
+
+input BulkRegistrationInput {
+  eventIds: [ID!]!
+  personalMessage: String
+  skipConflicts: Boolean
+}
+
+input ApprovalDecisionInput {
+  registrationId: ID!
+  approved: Boolean!
+  notes: String
+  conditions: [String!]
+}
+
+input AttendanceInput {
+  registrationId: ID!
+  status: AttendanceStatus!
+  notes: String
+  checkedInAt: DateTime
+}
+
+input RegistrationFilterInput {
+  eventId: ID
+  userId: ID
+  status: [RegistrationStatus!]
+  dateRange: DateRangeInput
+  attendanceStatus: [AttendanceStatus!]
+}
+
+# Enums
+enum RegistrationStatus {
+  PENDING_APPROVAL
+  CONFIRMED
+  WAITLISTED
+  CANCELLED
+  DECLINED
+  NO_SHOW
+  COMPLETED
+}
+
+enum AttendanceStatus {
+  REGISTERED
+  CHECKED_IN
+  COMPLETED
+  NO_SHOW
+  CANCELLED
+}
+
+enum ConflictType {
+  TIME_OVERLAP
+  LOCATION_CONFLICT
+  TRAVEL_TIME_CONFLICT
+  SKILL_OVERCOMMITMENT
+}
+
+enum ConflictSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+type RegistrationStats {
+  totalRegistrations: Int!
+  confirmedRegistrations: Int!
+  waitlistCount: Int!
+  attendanceRate: Float!
+  noShowRate: Float!
+  cancellationRate: Float!
+}
+
+extend type Query {
+  myRegistrations(filter: RegistrationFilterInput): [Registration!]!
+  registration(id: ID!): Registration
+  eventRegistrations(
+    eventId: ID!
+    filter: RegistrationFilterInput
+  ): [Registration!]!
+  waitlistEntries(eventId: ID!): [WaitlistEntry!]!
+  registrationConflicts(eventId: ID!): [RegistrationConflict!]!
+  attendanceRecords(eventId: ID!): [AttendanceRecord!]!
+  registrationStats(eventId: ID!): RegistrationStats!
+}
+
+input EmergencyContactInput {
+  name: String!
+  phone: String!
+}
+
+# Additional types used by queries
+type ActivityLog {
+  id: ID!
+  action: String!
+  ipAddress: String
+  userAgent: String
+  createdAt: Time!
+}
+
+scalar DateTime
+
+# A custom type for user skills to be used in the Registration type
+type UserSkill {
+  id: ID!
+  name: String!
+  proficiency: SkillProficiency!
+}
+
+# A custom input type for date ranges
+input DateRangeInput {
+  start: DateTime!
+  end: DateTime!
+}

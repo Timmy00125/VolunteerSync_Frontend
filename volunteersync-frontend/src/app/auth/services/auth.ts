@@ -19,9 +19,19 @@ import {
   REGISTER_MUTATION,
   REFRESH_TOKEN_MUTATION,
   LOGOUT_MUTATION,
-  REQUEST_PASSWORD_RESET_MUTATION,
 } from '../../graphql/mutations/auth.mutations';
 import { GET_CURRENT_USER } from '../../graphql/queries/auth.queries';
+import { gql } from 'apollo-angular';
+
+// Lightweight health query for diagnostics
+const HEALTH_QUERY = gql`
+  query HealthCheck {
+    health {
+      status
+      time
+    }
+  }
+`;
 
 @Injectable({
   providedIn: 'root',
@@ -73,12 +83,20 @@ export class AuthService {
     return this.apollo
       .mutate<{ login: AuthResponse }>({
         mutation: LOGIN_MUTATION,
-        variables: credentials,
+        variables: { input: credentials },
       })
       .pipe(
+        tap((result) => {
+          // Debug logging to inspect raw mutation result
+          // eslint-disable-next-line no-console
+          console.debug('[AuthService] login result', result);
+        }),
         map((result) => {
           if (result.data?.login) {
             return result.data.login;
+          }
+          if (result.errors && result.errors.length) {
+            throw new Error(result.errors[0].message);
           }
           throw new Error('Login failed: No data received');
         }),
@@ -107,9 +125,16 @@ export class AuthService {
         variables: { input: userData },
       })
       .pipe(
+        tap((result) => {
+          // eslint-disable-next-line no-console
+          console.debug('[AuthService] register result', result);
+        }),
         map((result) => {
           if (result.data?.register) {
             return result.data.register;
+          }
+          if (result.errors && result.errors.length) {
+            throw new Error(result.errors[0].message);
           }
           throw new Error('Registration failed: No data received');
         }),
@@ -122,6 +147,20 @@ export class AuthService {
           return throwError(() => error);
         }),
         tap(() => this.setLoading(false))
+      );
+  }
+
+  /**
+   * Check backend health (for diagnostics UI)
+   */
+  checkHealth(): Observable<string> {
+    return this.apollo
+      .query<{ health: { status: string } }>({ query: HEALTH_QUERY, fetchPolicy: 'no-cache' })
+      .pipe(
+        map((r) => r.data?.health?.status || 'UNKNOWN'),
+        catchError((err) => {
+          return of(this.extractErrorMessage(err));
+        })
       );
   }
 
@@ -164,7 +203,7 @@ export class AuthService {
     return this.apollo
       .mutate<{ refreshToken: RefreshTokenResponse }>({
         mutation: REFRESH_TOKEN_MUTATION,
-        variables: { refreshToken },
+        variables: { input: { refreshToken } },
       })
       .pipe(
         map((result) => {
@@ -205,24 +244,11 @@ export class AuthService {
   /**
    * Request password reset
    */
-  requestPasswordReset(email: string): Observable<boolean> {
-    this.setLoading(true);
-    this.setError(null);
-
-    return this.apollo
-      .mutate<{ requestPasswordReset: { success: boolean } }>({
-        mutation: REQUEST_PASSWORD_RESET_MUTATION,
-        variables: { email },
-      })
-      .pipe(
-        map((result) => result.data?.requestPasswordReset?.success || false),
-        catchError((error) => {
-          this.setError(this.extractErrorMessage(error));
-          this.setLoading(false);
-          return throwError(() => error);
-        }),
-        tap(() => this.setLoading(false))
-      );
+  // Password reset mutations are not available in the current backend schema.
+  // Implement later when backend supports it.
+  requestPasswordReset(_email: string): Observable<boolean> {
+    // Temporary stub: backend does not implement this yet.
+    return of(false);
   }
 
   /**
@@ -325,7 +351,14 @@ export class AuthService {
       return error.graphQLErrors[0].message;
     }
     if (error.networkError) {
-      return 'Network error occurred. Please try again.';
+      // Apollo networkError may contain statusCode, result, or a fetch error
+      const ne: any = error.networkError;
+      if (ne.status === 0 || /Failed to fetch|fetch failed|NetworkError/i.test(ne.message || '')) {
+        return 'Auth service unreachable. Check server is running.';
+      }
+      if (ne.status === 404) return 'Auth service endpoint not found (404).';
+      if (ne.status === 500) return 'Auth service internal error (500).';
+      return 'Network error communicating with auth service.';
     }
     return error.message || 'An unexpected error occurred.';
   }

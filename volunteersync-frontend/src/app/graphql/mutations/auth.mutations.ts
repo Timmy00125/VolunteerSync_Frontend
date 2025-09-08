@@ -3,8 +3,8 @@ import { FULL_USER_FRAGMENT } from '../fragments/user.fragments';
 
 export const LOGIN_MUTATION = gql`
   ${FULL_USER_FRAGMENT}
-  mutation Login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
+  mutation Login($input: LoginInput!) {
+    login(input: $input) {
       token
       refreshToken
       user {
@@ -28,8 +28,8 @@ export const REGISTER_MUTATION = gql`
 `;
 
 export const REFRESH_TOKEN_MUTATION = gql`
-  mutation RefreshToken($refreshToken: String!) {
-    refreshToken(refreshToken: $refreshToken) {
+  mutation RefreshToken($input: RefreshTokenInput!) {
+    refreshToken(input: $input) {
       token
       refreshToken
     }
@@ -38,34 +38,14 @@ export const REFRESH_TOKEN_MUTATION = gql`
 
 export const LOGOUT_MUTATION = gql`
   mutation Logout {
-    logout {
-      success
-    }
-  }
-`;
-
-export const REQUEST_PASSWORD_RESET_MUTATION = gql`
-  mutation RequestPasswordReset($email: String!) {
-    requestPasswordReset(email: $email) {
-      success
-      message
-    }
-  }
-`;
-
-export const CONFIRM_PASSWORD_RESET_MUTATION = gql`
-  mutation ConfirmPasswordReset($token: String!, $newPassword: String!) {
-    confirmPasswordReset(token: $token, newPassword: $newPassword) {
-      success
-      message
-    }
+    logout
   }
 `;
 
 export const UPDATE_USER_PROFILE_MUTATION = gql`
   ${FULL_USER_FRAGMENT}
-  mutation UpdateUserProfile($input: UpdateUserProfileInput!) {
-    updateUserProfile(input: $input) {
+  mutation UpdateProfile($input: UpdateProfileInput!) {
+    updateProfile(input: $input) {
       ...FullUserFragment
     }
   }

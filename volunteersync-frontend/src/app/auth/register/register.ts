@@ -11,7 +11,7 @@ import {
   AppNotificationComponent,
   NotificationType,
 } from '../../shared/components/notification/notification';
-import { UserRole } from '../../shared/models/user.model';
+// import { UserRole } from '../../shared/models/user.model';
 
 @Component({
   selector: 'app-register',
@@ -39,7 +39,7 @@ export class RegisterComponent implements OnInit {
       email: ['', [Validators.required, CustomValidators.emailFormat]],
       password: ['', [Validators.required, CustomValidators.passwordComplexity]],
       confirmPassword: ['', [Validators.required]],
-      role: [UserRole.VOLUNTEER, [Validators.required]],
+      // Backend schema doesn't accept role at registration; collect only name/email/password
       acceptTerms: [false, [Validators.requiredTrue]],
     },
     {
@@ -58,19 +58,7 @@ export class RegisterComponent implements OnInit {
     color: 'gray',
   });
 
-  // User roles for selection
-  readonly userRoles = [
-    {
-      value: UserRole.VOLUNTEER,
-      label: 'Volunteer',
-      description: 'I want to participate in volunteer activities',
-    },
-    {
-      value: UserRole.COORDINATOR,
-      label: 'Event Organizer',
-      description: 'I want to organize and manage volunteer events',
-    },
-  ];
+  // Roles selection removed for now to align with backend schema
 
   ngOnInit(): void {
     // Check if user is already authenticated
@@ -92,15 +80,13 @@ export class RegisterComponent implements OnInit {
       this.isSubmitting.set(true);
       this.notification.set(null);
 
-      const { firstName, lastName, email, password, role } = this.registerForm.value;
+      const { firstName, lastName, email, password } = this.registerForm.value;
 
       this.authService
         .register({
-          firstName,
-          lastName,
+          name: `${firstName} ${lastName}`.trim(),
           email,
           password,
-          role,
         })
         .subscribe({
           next: () => {

@@ -57,19 +57,19 @@ export class PasswordResetComponent implements OnInit {
 
       const { email } = this.resetForm.value;
 
-      this.authService.requestPasswordReset(email).subscribe({
-        next: (success) => {
+      this.authService.requestPasswordReset(email as string).subscribe({
+        next: (success: boolean) => {
           if (success) {
             this.isSuccess.set(true);
           } else {
             this.notification.set({
               type: 'error',
-              title: 'Reset Failed',
-              message: 'There was an error sending the reset email. Please try again.',
+              title: 'Reset Unavailable',
+              message: 'Password reset is not available yet. Please contact support.',
             });
           }
         },
-        error: (error) => {
+        error: (_err: unknown) => {
           this.isSubmitting.set(false);
           this.notification.set({
             type: 'error',
