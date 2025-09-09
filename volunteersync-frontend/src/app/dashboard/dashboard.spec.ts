@@ -35,7 +35,7 @@ describe('DashboardComponent', () => {
 
   it('should call authService.logout and navigate to login on logout', () => {
     const navigateSpy = spyOn(router, 'navigate');
-    authService.logout.and.returnValue(of(undefined));
+    authService.logout.and.returnValue(of(true));
 
     component.onLogout();
 

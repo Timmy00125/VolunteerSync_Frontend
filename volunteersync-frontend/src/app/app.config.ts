@@ -16,9 +16,9 @@ import { provideApollo } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
 import { InMemoryCache, NormalizedCacheObject, from } from '@apollo/client/core';
 import { setContext } from '@apollo/client/link/context';
-import { onError } from '@apollo/client/link/error';
 import { Router } from '@angular/router';
 import { environment } from '../environments/environment';
+import { ApolloErrorLinkService } from './shared/services/apollo-error-link';
 
 // Apollo cache token so we can re-use the same cache instance across SSR and browser
 const APOLLO_CACHE = new InjectionToken<InMemoryCache>('APOLLO_CACHE');
@@ -44,6 +44,9 @@ export const appConfig: ApplicationConfig = {
             User: {
               keyFields: ['id'],
             },
+            Event: {
+              keyFields: ['id'],
+            },
           },
         }),
     },
@@ -51,6 +54,7 @@ export const appConfig: ApplicationConfig = {
       const httpLink = inject(HttpLink);
       const cache = inject(APOLLO_CACHE);
       const router = inject(Router);
+      const apolloErrorLinkService = inject(ApolloErrorLinkService);
 
       // SSR rehydration using Angular TransferState
       const transferState = inject(TransferState);
@@ -90,32 +94,10 @@ export const appConfig: ApplicationConfig = {
         };
       });
 
-      // Error handling link
-      const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
-        if (graphQLErrors) {
-          graphQLErrors.forEach(({ message, locations, path, extensions }) => {
-            console.error(
-              `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-            );
+      // Enhanced error handling link using the service
+      const errorLink = apolloErrorLinkService.createErrorLink();
 
-            // Handle authentication errors
-            if (extensions?.['code'] === 'UNAUTHENTICATED') {
-              handleUnauthenticated(router);
-            }
-          });
-        }
-
-        if (networkError) {
-          console.error(`[Network error]: ${networkError}`);
-
-          // Handle network authentication errors
-          if ('status' in networkError && networkError.status === 401) {
-            handleUnauthenticated(router);
-          }
-        }
-      });
-
-      // Combine all links
+      // Combine all links with enhanced error handling
       const link = from([errorLink, authLink, httpLinkHandler]);
 
       return {
@@ -124,6 +106,7 @@ export const appConfig: ApplicationConfig = {
         defaultOptions: {
           watchQuery: {
             errorPolicy: 'all',
+            notifyOnNetworkStatusChange: true,
           },
           query: {
             errorPolicy: 'all',
@@ -136,17 +119,3 @@ export const appConfig: ApplicationConfig = {
     }),
   ],
 };
-
-/**
- * Handle unauthenticated errors
- */
-function handleUnauthenticated(router: Router): void {
-  // Clear stored tokens
-  if (typeof localStorage !== 'undefined') {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('refreshToken');
-  }
-
-  // Redirect to login page
-  router.navigate(['/auth/login']);
-}

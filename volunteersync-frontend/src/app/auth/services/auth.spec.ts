@@ -16,13 +16,14 @@ describe('AuthService', () => {
   const mockUser: User = {
     id: '1',
     email: 'test@example.com',
-    firstName: 'Test',
-    lastName: 'User',
-    role: UserRole.VOLUNTEER,
+    name: 'Test User',
+    emailVerified: true,
+    roles: ['volunteer'],
   };
 
   const mockAuthResponse: AuthResponse = {
-    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE3MzYyMzkwMjJ9.4J-0GvJp_wD4s_3_a-Zc-C_a_b_c_d_e_f_g_h_i_j_k_l_m_n_o_p',
+    token:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE3MzYyMzkwMjJ9.4J-0GvJp_wD4s_3_a-Zc-C_a_b_c_d_e_f_g_h_i_j_k_l_m_n_o_p',
     refreshToken: 'mock-refresh-token',
     user: mockUser,
   };
@@ -42,7 +43,7 @@ describe('AuthService', () => {
       },
       clear: () => {
         store = {};
-      }
+      },
     };
 
     spyOn(localStorage, 'getItem').and.callFake(mockLocalStorage.getItem);
@@ -54,7 +55,6 @@ describe('AuthService', () => {
     const routerSpyObj = jasmine.createSpyObj('Router', ['navigate']);
     const apolloClientSpy = jasmine.createSpyObj('ApolloClient', ['clearStore']);
     apolloSpyObj.client = apolloClientSpy;
-
 
     TestBed.configureTestingModule({
       providers: [
@@ -91,7 +91,7 @@ describe('AuthService', () => {
     it('should authenticate user and store tokens on successful login', (done) => {
       apolloSpy.mutate.and.returnValue(of({ data: { login: mockAuthResponse } }));
 
-      service.login({ email: 'test@example.com', password: 'password' }).subscribe(response => {
+      service.login({ email: 'test@example.com', password: 'password' }).subscribe((response) => {
         expect(response).toEqual(mockAuthResponse);
         expect(service.currentUser()).toEqual(mockUser);
         expect(service.isAuthenticated()).toBeTrue();
@@ -112,7 +112,7 @@ describe('AuthService', () => {
           expect(service.error()).toBe('Invalid credentials');
           expect(err).toEqual(error);
           done();
-        }
+        },
       });
     });
   });
@@ -121,14 +121,16 @@ describe('AuthService', () => {
     it('should register user and store tokens on successful registration', (done) => {
       apolloSpy.mutate.and.returnValue(of({ data: { register: mockAuthResponse } }));
 
-      service.register({ email: 'test@example.com', password: 'password', firstName: 'Test', lastName: 'User' }).subscribe(response => {
-        expect(response).toEqual(mockAuthResponse);
-        expect(service.currentUser()).toEqual(mockUser);
-        expect(service.isAuthenticated()).toBeTrue();
-        expect(localStorage.getItem('authToken')).toBe(mockAuthResponse.token);
-        expect(localStorage.getItem('refreshToken')).toBe('mock-refresh-token');
-        done();
-      });
+      service
+        .register({ email: 'test@example.com', password: 'password', name: 'Test User' })
+        .subscribe((response) => {
+          expect(response).toEqual(mockAuthResponse);
+          expect(service.currentUser()).toEqual(mockUser);
+          expect(service.isAuthenticated()).toBeTrue();
+          expect(localStorage.getItem('authToken')).toBe(mockAuthResponse.token);
+          expect(localStorage.getItem('refreshToken')).toBe('mock-refresh-token');
+          done();
+        });
     });
   });
 

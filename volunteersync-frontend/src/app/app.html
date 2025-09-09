@@ -1,1 +1,13 @@
-<router-outlet />
+<!-- Main application layout -->
+<div class="min-h-screen bg-gray-50">
+  <!-- Header navigation -->
+  <app-header />
+
+  <!-- Main content area -->
+  <main class="flex-1">
+    <router-outlet />
+  </main>
+
+  <!-- Global notifications -->
+  <app-notification-container />
+</div>
