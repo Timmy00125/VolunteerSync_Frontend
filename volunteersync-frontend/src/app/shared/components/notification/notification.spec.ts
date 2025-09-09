@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppNotificationComponent } from './notification';
-import { input } from '@angular/core';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 describe('AppNotificationComponent', () => {
   let component: AppNotificationComponent;
@@ -9,6 +9,7 @@ describe('AppNotificationComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppNotificationComponent],
+      providers: [provideZonelessChangeDetection()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppNotificationComponent);
@@ -16,16 +17,16 @@ describe('AppNotificationComponent', () => {
   });
 
   it('should create', () => {
-    component.type = input('success');
-    component.message = input('Test message');
+    fixture.componentRef.setInput('type', 'success');
+    fixture.componentRef.setInput('message', 'Test message');
     fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
   it('should emit onDismiss when dismiss is called', () => {
     spyOn(component.onDismiss, 'emit');
-    component.type = input('info');
-    component.message = input('Test message');
+    fixture.componentRef.setInput('type', 'info');
+    fixture.componentRef.setInput('message', 'Test message');
     fixture.detectChanges();
 
     component.dismiss();
@@ -33,15 +34,16 @@ describe('AppNotificationComponent', () => {
     expect(component.onDismiss.emit).toHaveBeenCalled();
   });
 
-  it('should auto-close after duration', fakeAsync(() => {
+  it('should auto-close after duration', async () => {
     spyOn(component, 'dismiss');
-    component.type = input('success');
-    component.message = input('Test');
-    component.autoClose = input(true);
-    component.duration = input(100);
+    fixture.componentRef.setInput('type', 'success');
+    fixture.componentRef.setInput('message', 'Test');
+    fixture.componentRef.setInput('autoClose', true);
+    fixture.componentRef.setInput('duration', 100);
     fixture.detectChanges();
 
-    tick(100);
+    // Wait for the duration using Promise-based delay instead of fakeAsync
+    await new Promise((resolve) => setTimeout(resolve, 150));
     expect(component.dismiss).toHaveBeenCalled();
-  }));
+  });
 });

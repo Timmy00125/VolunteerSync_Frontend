@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
@@ -26,6 +27,7 @@ describe('PasswordResetComponent', () => {
     await TestBed.configureTestingModule({
       imports: [PasswordResetComponent, ReactiveFormsModule, RouterTestingModule],
       providers: [
+        provideZonelessChangeDetection(),
         { provide: AuthService, useValue: authServiceSpy },
         { provide: ValidationService, useValue: validationServiceSpy },
       ],

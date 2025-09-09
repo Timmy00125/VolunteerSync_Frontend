@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { ApolloTestingController, ApolloTestingModule } from 'apollo-angular/testing';
 import { EventService } from './event';
 import {
@@ -94,7 +95,7 @@ describe('EventService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [ApolloTestingModule],
-      providers: [EventService],
+      providers: [provideZonelessChangeDetection(), EventService],
     });
     service = TestBed.inject(EventService);
     controller = TestBed.inject(ApolloTestingController);

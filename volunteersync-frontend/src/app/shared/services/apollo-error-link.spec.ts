@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { ApolloErrorLinkService } from './apollo-error-link';
 import { Router } from '@angular/router';
 import { ErrorHandlerService } from './error-handler';
@@ -17,6 +18,7 @@ describe('ApolloErrorLinkService', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        provideZonelessChangeDetection(),
         ApolloErrorLinkService,
         { provide: ErrorHandlerService, useValue: errorHandlerMock },
         { provide: Router, useValue: routerMock },

@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { ErrorHandlerService } from './error-handler';
 import { NotificationService } from './notification';
 import { ApolloError } from '@apollo/client/core';
@@ -14,6 +15,7 @@ describe('ErrorHandlerService', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        provideZonelessChangeDetection(),
         ErrorHandlerService,
         { provide: NotificationService, useValue: notificationServiceMock },
       ],

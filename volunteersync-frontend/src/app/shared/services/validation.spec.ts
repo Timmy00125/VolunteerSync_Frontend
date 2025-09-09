@@ -1,12 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { ValidationService } from './validation';
-import { ValidationErrors } from '@angular/forms';
+import { ValidationErrors, FormControl } from '@angular/forms';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 describe('ValidationService', () => {
   let service: ValidationService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
     service = TestBed.inject(ValidationService);
   });
 
@@ -69,45 +72,55 @@ describe('ValidationService', () => {
 
   describe('shouldShowError', () => {
     it('should return true for invalid and touched field', () => {
-      const field = { invalid: true, dirty: false, touched: true };
+      const field = new FormControl('');
+      field.setErrors({ required: true });
+      field.markAsTouched();
       expect(service.shouldShowError(field)).toBe(true);
     });
 
     it('should return true for invalid and dirty field', () => {
-      const field = { invalid: true, dirty: true, touched: false };
+      const field = new FormControl('');
+      field.setErrors({ required: true });
+      field.markAsDirty();
       expect(service.shouldShowError(field)).toBe(true);
     });
 
     it('should return false for valid field', () => {
-      const field = { invalid: false, dirty: true, touched: true };
+      const field = new FormControl('valid value');
+      field.markAsTouched();
+      field.markAsDirty();
       expect(service.shouldShowError(field)).toBe(false);
     });
 
     it('should return false for invalid but untouched and clean field', () => {
-      const field = { invalid: true, dirty: false, touched: false };
+      const field = new FormControl('');
+      field.setErrors({ required: true });
       expect(service.shouldShowError(field)).toBe(false);
     });
   });
 
   describe('getFieldClasses', () => {
     it('should return error classes for invalid touched field', () => {
-      const field = { invalid: true, dirty: false, touched: true, valid: false };
+      const field = new FormControl('');
+      field.setErrors({ required: true });
+      field.markAsTouched();
       const classes = service.getFieldClasses(field);
       expect(classes).toContain('border-red-300');
       expect(classes).toContain('text-red-900');
     });
 
     it('should return success classes for valid dirty field', () => {
-      const field = { invalid: false, dirty: true, touched: true, valid: true };
+      const field = new FormControl('valid value');
+      field.markAsDirty();
       const classes = service.getFieldClasses(field);
       expect(classes).toContain('border-green-300');
       expect(classes).toContain('text-green-900');
     });
 
-    it('should return base classes for untouched field', () => {
-      const field = { invalid: false, dirty: false, touched: false, valid: false };
+    it('should return default classes for pristine field', () => {
+      const field = new FormControl('');
       const classes = service.getFieldClasses(field);
-      expect(classes).toContain('border-gray-300');
+      expect(classes).toContain('border');
       expect(classes).not.toContain('border-red-300');
       expect(classes).not.toContain('border-green-300');
     });

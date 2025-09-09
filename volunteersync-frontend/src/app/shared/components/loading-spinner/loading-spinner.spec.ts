@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoadingSpinnerComponent } from './loading-spinner';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 describe('LoadingSpinnerComponent', () => {
   let component: LoadingSpinnerComponent;
@@ -8,6 +9,7 @@ describe('LoadingSpinnerComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LoadingSpinnerComponent],
+      providers: [provideZonelessChangeDetection()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoadingSpinnerComponent);
@@ -20,15 +22,12 @@ describe('LoadingSpinnerComponent', () => {
   });
 
   it('should apply size and color classes', () => {
-    component.size = input('lg');
-    component.color = input('white');
+    // Set component inputs directly using fixture.componentRef.setInput()
+    fixture.componentRef.setInput('size', 'lg');
+    fixture.componentRef.setInput('color', 'white');
     fixture.detectChanges();
 
     expect(component.sizeClasses).toBe('h-12 w-12');
     expect(component.colorClasses).toBe('text-white');
   });
 });
-
-// Helper to deal with signal inputs in tests
-import { input } from '@angular/core';
-

@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 import { LoginComponent } from './login';
 import { AuthService } from '../services/auth';
@@ -29,6 +30,7 @@ describe('LoginComponent', () => {
     await TestBed.configureTestingModule({
       imports: [LoginComponent, ReactiveFormsModule, RouterTestingModule],
       providers: [
+        provideZonelessChangeDetection(),
         { provide: AuthService, useValue: authServiceSpy },
         { provide: ValidationService, useValue: validationServiceSpy },
       ],
