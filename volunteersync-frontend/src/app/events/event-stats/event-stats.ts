@@ -53,6 +53,7 @@ export interface StatCard {
     MatButtonModule,
   ],
   templateUrl: './event-stats.html',
+  styleUrl: './event-stats.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventStats implements OnInit {
