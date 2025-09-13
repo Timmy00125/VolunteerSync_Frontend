@@ -433,6 +433,7 @@ input RegisterInput {
   name: String!
   email: String!
   password: String!
+  role: String
 }
 
 input LoginInput {
