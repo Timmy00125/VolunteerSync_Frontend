@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppNotificationComponent } from './notification';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { testConfig } from '../../../test-config';
 
 describe('AppNotificationComponent', () => {
   let component: AppNotificationComponent;
@@ -9,7 +9,7 @@ describe('AppNotificationComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppNotificationComponent],
-      providers: [provideZonelessChangeDetection()],
+      providers: [...testConfig.providers],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppNotificationComponent);

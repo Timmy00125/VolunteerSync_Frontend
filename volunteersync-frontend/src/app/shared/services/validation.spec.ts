@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { ValidationService } from './validation';
 import { ValidationErrors, FormControl } from '@angular/forms';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { testConfig } from '../../test-config';
 
 describe('ValidationService', () => {
   let service: ValidationService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideZonelessChangeDetection()],
+      providers: [...testConfig.providers],
     });
     service = TestBed.inject(ValidationService);
   });

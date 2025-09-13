@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
-import { provideZonelessChangeDetection } from '@angular/core';
 
 import { DashboardComponent } from './dashboard';
 import { AuthService } from '../auth/services/auth';
 import { Router } from '@angular/router';
+import { testConfig } from '../test-config';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -22,7 +22,7 @@ describe('DashboardComponent', () => {
         RouterTestingModule.withRoutes([{ path: 'auth/login', redirectTo: '' }]),
       ],
       providers: [
-        provideZonelessChangeDetection(),
+        ...testConfig.providers,
         { provide: AuthService, useValue: authServiceSpy },
       ],
     }).compileComponents();

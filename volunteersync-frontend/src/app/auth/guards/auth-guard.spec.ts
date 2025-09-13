@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
 import { authGuard } from './auth-guard';
 import { AuthService } from '../services/auth';
+import { testConfig } from '../../test-config';
 
 describe('authGuard', () => {
   const executeGuard: CanActivateFn = (...guardParameters) =>
@@ -17,7 +17,7 @@ describe('authGuard', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        provideZonelessChangeDetection(),
+        ...testConfig.providers,
         { provide: AuthService, useValue: authServiceMock },
         { provide: Router, useValue: routerMock },
       ],

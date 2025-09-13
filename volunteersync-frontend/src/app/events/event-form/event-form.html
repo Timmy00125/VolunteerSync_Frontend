@@ -1,0 +1,561 @@
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">
+      {{ isEditMode() ? 'Edit Event' : 'Create New Event' }}
+    </h1>
+    <p class="text-gray-600">
+      {{
+        isEditMode() ? 'Update event details and settings' : 'Create a new volunteer opportunity'
+      }}
+    </p>
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="space-y-8">
+    <!-- Basic Information -->
+    <div class="bg-white rounded-lg shadow-sm border p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-6">Basic Information</h2>
+
+      <div class="grid grid-cols-1 gap-6">
+        <!-- Title -->
+        <div>
+          <label for="title" class="block text-sm font-medium text-gray-700 mb-1">
+            Event Title *
+          </label>
+          <input
+            id="title"
+            type="text"
+            formControlName="title"
+            placeholder="Enter event title"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldInvalid('title')"
+          />
+          <div *ngIf="getFieldError('title')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('title') }}
+          </div>
+        </div>
+
+        <!-- Short Description -->
+        <div>
+          <label for="shortDescription" class="block text-sm font-medium text-gray-700 mb-1">
+            Short Description
+          </label>
+          <input
+            id="shortDescription"
+            type="text"
+            formControlName="shortDescription"
+            placeholder="Brief description (optional)"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldInvalid('shortDescription')"
+          />
+          <div *ngIf="getFieldError('shortDescription')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('shortDescription') }}
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
+            Event Description *
+          </label>
+          <textarea
+            id="description"
+            formControlName="description"
+            rows="4"
+            placeholder="Detailed description of the event, activities, and expectations"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldInvalid('description')"
+          ></textarea>
+          <div *ngIf="getFieldError('description')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('description') }}
+          </div>
+        </div>
+
+        <!-- Category and Time Commitment -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="category" class="block text-sm font-medium text-gray-700 mb-1">
+              Category *
+            </label>
+            <select
+              id="category"
+              formControlName="category"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="isFieldInvalid('category')"
+            >
+              <option *ngFor="let category of categories()" [value]="category">
+                {{ category.replace('_', ' ') | titlecase }}
+              </option>
+            </select>
+            <div *ngIf="getFieldError('category')" class="mt-1 text-sm text-red-600">
+              {{ getFieldError('category') }}
+            </div>
+          </div>
+
+          <div>
+            <label for="timeCommitment" class="block text-sm font-medium text-gray-700 mb-1">
+              Time Commitment *
+            </label>
+            <select
+              id="timeCommitment"
+              formControlName="timeCommitment"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="isFieldInvalid('timeCommitment')"
+            >
+              <option *ngFor="let commitment of timeCommitments()" [value]="commitment">
+                {{ commitment.replace('_', ' ') | titlecase }}
+              </option>
+            </select>
+            <div *ngIf="getFieldError('timeCommitment')" class="mt-1 text-sm text-red-600">
+              {{ getFieldError('timeCommitment') }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Date and Time -->
+    <div class="bg-white rounded-lg shadow-sm border p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-6">Date and Time</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="startTime" class="block text-sm font-medium text-gray-700 mb-1">
+            Start Date & Time *
+          </label>
+          <input
+            id="startTime"
+            type="datetime-local"
+            formControlName="startTime"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldInvalid('startTime')"
+          />
+          <div *ngIf="getFieldError('startTime')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('startTime') }}
+          </div>
+        </div>
+
+        <div>
+          <label for="endTime" class="block text-sm font-medium text-gray-700 mb-1">
+            End Date & Time *
+          </label>
+          <input
+            id="endTime"
+            type="datetime-local"
+            formControlName="endTime"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldInvalid('endTime')"
+          />
+          <div *ngIf="getFieldError('endTime')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('endTime') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Date Range Error -->
+      <div *ngIf="eventForm.hasError('dateRange')" class="mt-2 text-sm text-red-600">
+        End date must be after start date
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="bg-white rounded-lg shadow-sm border p-6" formGroupName="location">
+      <h2 class="text-xl font-semibold text-gray-900 mb-6">Location</h2>
+
+      <div class="space-y-6">
+        <!-- Remote Event Checkbox -->
+        <div class="flex items-center">
+          <input
+            id="isRemote"
+            type="checkbox"
+            formControlName="isRemote"
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+          <label for="isRemote" class="ml-2 block text-sm text-gray-900">
+            This is a remote/virtual event
+          </label>
+        </div>
+
+        <!-- Location Name -->
+        <div>
+          <label for="locationName" class="block text-sm font-medium text-gray-700 mb-1">
+            Location Name *
+          </label>
+          <input
+            id="locationName"
+            type="text"
+            formControlName="name"
+            placeholder="e.g., Community Center, Online Platform"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldInvalid('location.name')"
+          />
+          <div *ngIf="getFieldError('location.name')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('location.name') }}
+          </div>
+        </div>
+
+        <!-- Address -->
+        <div>
+          <label for="address" class="block text-sm font-medium text-gray-700 mb-1">
+            Address *
+          </label>
+          <input
+            id="address"
+            type="text"
+            formControlName="address"
+            placeholder="Street address or online meeting link"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldInvalid('location.address')"
+          />
+          <div *ngIf="getFieldError('location.address')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('location.address') }}
+          </div>
+        </div>
+
+        <!-- City, State, Country -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label for="city" class="block text-sm font-medium text-gray-700 mb-1"> City * </label>
+            <input
+              id="city"
+              type="text"
+              formControlName="city"
+              placeholder="City"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="isFieldInvalid('location.city')"
+            />
+            <div *ngIf="getFieldError('location.city')" class="mt-1 text-sm text-red-600">
+              {{ getFieldError('location.city') }}
+            </div>
+          </div>
+
+          <div>
+            <label for="state" class="block text-sm font-medium text-gray-700 mb-1">
+              State/Province
+            </label>
+            <input
+              id="state"
+              type="text"
+              formControlName="state"
+              placeholder="State/Province"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label for="country" class="block text-sm font-medium text-gray-700 mb-1">
+              Country *
+            </label>
+            <input
+              id="country"
+              type="text"
+              formControlName="country"
+              placeholder="Country"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="isFieldInvalid('location.country')"
+            />
+            <div *ngIf="getFieldError('location.country')" class="mt-1 text-sm text-red-600">
+              {{ getFieldError('location.country') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Instructions -->
+        <div>
+          <label for="instructions" class="block text-sm font-medium text-gray-700 mb-1">
+            Location Instructions
+          </label>
+          <textarea
+            id="instructions"
+            formControlName="instructions"
+            rows="3"
+            placeholder="Special instructions for finding the location or accessing the event"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Capacity -->
+    <div class="bg-white rounded-lg shadow-sm border p-6" formGroupName="capacity">
+      <h2 class="text-xl font-semibold text-gray-900 mb-6">Capacity Settings</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label for="minimum" class="block text-sm font-medium text-gray-700 mb-1">
+            Minimum Volunteers *
+          </label>
+          <input
+            id="minimum"
+            type="number"
+            formControlName="minimum"
+            min="1"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldInvalid('capacity.minimum')"
+          />
+          <div *ngIf="getFieldError('capacity.minimum')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('capacity.minimum') }}
+          </div>
+        </div>
+
+        <div>
+          <label for="maximum" class="block text-sm font-medium text-gray-700 mb-1">
+            Maximum Volunteers *
+          </label>
+          <input
+            id="maximum"
+            type="number"
+            formControlName="maximum"
+            min="1"
+            max="1000"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="isFieldInvalid('capacity.maximum')"
+          />
+          <div *ngIf="getFieldError('capacity.maximum')" class="mt-1 text-sm text-red-600">
+            {{ getFieldError('capacity.maximum') }}
+          </div>
+        </div>
+
+        <div class="flex items-center pt-6">
+          <input
+            id="waitlistEnabled"
+            type="checkbox"
+            formControlName="waitlistEnabled"
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+          <label for="waitlistEnabled" class="ml-2 block text-sm text-gray-900">
+            Enable waitlist when full
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Requirements -->
+    <div class="bg-white rounded-lg shadow-sm border p-6" formGroupName="requirements">
+      <h2 class="text-xl font-semibold text-gray-900 mb-6">Requirements</h2>
+
+      <div class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="minimumAge" class="block text-sm font-medium text-gray-700 mb-1">
+              Minimum Age
+            </label>
+            <input
+              id="minimumAge"
+              type="number"
+              formControlName="minimumAge"
+              min="13"
+              max="100"
+              placeholder="e.g., 18"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="isFieldInvalid('requirements.minimumAge')"
+            />
+            <div *ngIf="getFieldError('requirements.minimumAge')" class="mt-1 text-sm text-red-600">
+              {{ getFieldError('requirements.minimumAge') }}
+            </div>
+          </div>
+
+          <div class="flex items-center pt-6">
+            <input
+              id="backgroundCheck"
+              type="checkbox"
+              formControlName="backgroundCheck"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label for="backgroundCheck" class="ml-2 block text-sm text-gray-900">
+              Background check required
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label for="physicalRequirements" class="block text-sm font-medium text-gray-700 mb-1">
+            Physical Requirements
+          </label>
+          <textarea
+            id="physicalRequirements"
+            formControlName="physicalRequirements"
+            rows="3"
+            placeholder="Any physical requirements or limitations to note"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Registration Settings -->
+    <div class="bg-white rounded-lg shadow-sm border p-6" formGroupName="registrationSettings">
+      <h2 class="text-xl font-semibold text-gray-900 mb-6">Registration Settings</h2>
+
+      <div class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="flex items-center">
+            <input
+              id="requiresApproval"
+              type="checkbox"
+              formControlName="requiresApproval"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label for="requiresApproval" class="ml-2 block text-sm text-gray-900">
+              Require approval for registrations
+            </label>
+          </div>
+
+          <div class="flex items-center">
+            <input
+              id="allowWaitlist"
+              type="checkbox"
+              formControlName="allowWaitlist"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label for="allowWaitlist" class="ml-2 block text-sm text-gray-900">
+              Allow waitlist
+            </label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="closesAt" class="block text-sm font-medium text-gray-700 mb-1">
+              Registration Deadline *
+            </label>
+            <input
+              id="closesAt"
+              type="datetime-local"
+              formControlName="closesAt"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label for="cancellationDeadline" class="block text-sm font-medium text-gray-700 mb-1">
+              Cancellation Deadline
+            </label>
+            <input
+              id="cancellationDeadline"
+              type="datetime-local"
+              formControlName="cancellationDeadline"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          <input
+            id="confirmationRequired"
+            type="checkbox"
+            formControlName="confirmationRequired"
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+          <label for="confirmationRequired" class="ml-2 block text-sm text-gray-900">
+            Require registration confirmation
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 pt-6">
+      <button
+        type="submit"
+        [disabled]="loading() || eventForm.invalid"
+        class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+      >
+        <span *ngIf="!loading()">
+          {{ isEditMode() ? 'Update Event' : 'Create Event' }}
+        </span>
+        <span *ngIf="loading()" class="flex items-center justify-center">
+          <svg
+            class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          {{ isEditMode() ? 'Updating...' : 'Creating...' }}
+        </span>
+      </button>
+
+      <button
+        type="button"
+        (click)="onSaveDraft()"
+        [disabled]="loading()"
+        class="flex-1 bg-gray-600 text-white px-6 py-3 rounded-md font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+      >
+        Save as Draft
+      </button>
+
+      <button
+        type="button"
+        (click)="onCancel()"
+        [disabled]="loading()"
+        class="flex-1 bg-white text-gray-700 px-6 py-3 rounded-md font-medium border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+      >
+        Cancel
+      </button>
+
+      <button
+        *ngIf="isEditMode()"
+        type="button"
+        (click)="onDelete()"
+        [disabled]="loading()"
+        class="bg-red-600 text-white px-6 py-3 rounded-md font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+      >
+        Delete Event
+      </button>
+    </div>
+  </form>
+
+  <!-- Success/Error Messages -->
+  <div
+    *ngIf="eventUiService.success()"
+    class="mt-4 bg-green-50 border border-green-200 rounded-md p-4"
+  >
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-green-700">{{ eventUiService.success() }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="eventUiService.error()" class="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-red-800">Error</h3>
+        <p class="text-sm text-red-700 mt-1">{{ eventUiService.error() }}</p>
+      </div>
+    </div>
+  </div>
+</div>

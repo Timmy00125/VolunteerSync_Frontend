@@ -42,31 +42,39 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
 
-  // Event routes (protected) - placeholder redirects until components are created
+  // Event routes (protected)
   {
     path: 'events',
     canActivate: [authGuard],
     children: [
       {
         path: '',
-        // List all events component (future implementation)
-        redirectTo: '/dashboard',
-        pathMatch: 'full',
+        loadComponent: () =>
+          import('./events/event-list/event-list').then((m) => m.EventListComponent),
       },
       {
         path: 'create',
-        // Event creation form (coordinator/admin only) - temporary redirect until Phase 2
-        redirectTo: '/dashboard',
-      },
-      {
-        path: 'manage',
-        // Event management (coordinator/admin only) - temporary redirect until Phase 2
-        redirectTo: '/dashboard',
+        loadComponent: () => import('./events/event-form/event-form').then((m) => m.EventForm),
+        canActivate: [roleGuard],
+        data: { roles: ['COORDINATOR', 'ADMIN'] },
       },
       {
         path: ':id',
-        // Event details view
-        redirectTo: '/dashboard',
+        loadComponent: () =>
+          import('./events/event-detail/event-detail').then((m) => m.EventDetail),
+      },
+      {
+        path: ':id/edit',
+        loadComponent: () => import('./events/event-form/event-form').then((m) => m.EventForm),
+        canActivate: [roleGuard],
+        data: { roles: ['COORDINATOR', 'ADMIN'] },
+      },
+      {
+        path: ':id/register',
+        loadComponent: () =>
+          import('./events/event-registration/event-registration').then(
+            (m) => m.EventRegistrationComponent
+          ),
       },
     ],
   },
@@ -92,11 +100,13 @@ export const routes: Routes = [
   // Error pages
   {
     path: 'unauthorized',
-    loadComponent: () => import('./shared/components/unauthorized/unauthorized').then(m => m.UnauthorizedComponent)
+    loadComponent: () =>
+      import('./shared/components/unauthorized/unauthorized').then((m) => m.UnauthorizedComponent),
   },
   {
     path: 'not-found',
-    loadComponent: () => import('./shared/components/not-found/not-found').then(m => m.NotFoundComponent)
+    loadComponent: () =>
+      import('./shared/components/not-found/not-found').then((m) => m.NotFoundComponent),
   },
 
   // Wildcard route - must be last
