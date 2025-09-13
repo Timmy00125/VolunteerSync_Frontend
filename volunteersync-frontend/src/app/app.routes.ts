@@ -56,7 +56,7 @@ export const routes: Routes = [
         path: 'create',
         loadComponent: () => import('./events/event-form/event-form').then((m) => m.EventForm),
         canActivate: [roleGuard],
-        data: { roles: ['COORDINATOR', 'ADMIN'] },
+        data: { roles: ['organizer', 'admin'] },
       },
       {
         path: ':id',
@@ -67,7 +67,7 @@ export const routes: Routes = [
         path: ':id/edit',
         loadComponent: () => import('./events/event-form/event-form').then((m) => m.EventForm),
         canActivate: [roleGuard],
-        data: { roles: ['COORDINATOR', 'ADMIN'] },
+        data: { roles: ['organizer', 'admin'] },
       },
       {
         path: ':id/register',

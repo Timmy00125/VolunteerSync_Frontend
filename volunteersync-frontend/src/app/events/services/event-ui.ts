@@ -9,7 +9,7 @@ import {
   CreateEventInput,
   UpdateEventInput,
 } from '../../shared/models/event.model';
-import { User } from '../../shared/models/user.model';
+import { User, UserRole } from '../../shared/models/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -53,7 +53,7 @@ export class EventUiService {
           maximum: [null, [Validators.required, Validators.min(1), Validators.max(10000)]],
           waitlistEnabled: [true],
         }),
-        category: ['VOLUNTEER', Validators.required],
+        category: ['user', Validators.required],
         timeCommitment: ['ONE_TIME', Validators.required],
         tags: [[]],
         registrationSettings: this.fb.group({
@@ -250,8 +250,8 @@ export class EventUiService {
     if (!currentUser) return false;
     return (
       event.organizerId === currentUser.id ||
-      currentUser.roles.includes('ADMIN') ||
-      currentUser.roles.includes('COORDINATOR')
+      currentUser.roles.includes(UserRole.ADMIN) ||
+      currentUser.roles.includes(UserRole.COORDINATOR)
     );
   }
 

@@ -10,14 +10,20 @@ describe('roleGuard', () => {
   const executeGuard: CanActivateFn = (...guardParameters) =>
     TestBed.runInInjectionContext(() => roleGuard(...guardParameters));
 
-  let authServiceMock: { currentUser: any; };
+  let authServiceMock: { currentUser: any };
   let routerMock: jasmine.SpyObj<Router>;
 
-  const mockUser: User = { id: '1', name: 'Test', email: 'test@test.com', roles: ['VOLUNTEER'], emailVerified: true };
+  const mockUser: User = {
+    id: '1',
+    name: 'Test',
+    email: 'test@test.com',
+    roles: ['user'],
+    emailVerified: true,
+  };
 
   beforeEach(() => {
     authServiceMock = {
-      currentUser: signal(null)
+      currentUser: signal(null),
     };
     routerMock = jasmine.createSpyObj('Router', ['createUrlTree']);
 
@@ -39,7 +45,10 @@ describe('roleGuard', () => {
     const dummyUrlTree = new UrlTree();
     routerMock.createUrlTree.and.returnValue(dummyUrlTree);
 
-    const canActivate = executeGuard({ data: { roles: ['ADMIN'] } } as any, { url: '/admin' } as any) as UrlTree;
+    const canActivate = executeGuard(
+      { data: { roles: ['admin'] } } as any,
+      { url: '/admin' } as any
+    ) as UrlTree;
 
     expect(canActivate).toBe(dummyUrlTree);
     expect(routerMock.createUrlTree).toHaveBeenCalledWith(['/auth/login'], {
@@ -49,7 +58,7 @@ describe('roleGuard', () => {
 
   it('should allow access if user has the required role', () => {
     authServiceMock.currentUser.set(mockUser);
-    const canActivate = executeGuard({ data: { roles: ['VOLUNTEER'] } } as any, {} as any) as boolean;
+    const canActivate = executeGuard({ data: { roles: ['user'] } } as any, {} as any) as boolean;
     expect(canActivate).toBe(true);
   });
 
@@ -58,7 +67,7 @@ describe('roleGuard', () => {
     const dummyUrlTree = new UrlTree();
     routerMock.createUrlTree.and.returnValue(dummyUrlTree);
 
-    const canActivate = executeGuard({ data: { roles: ['ADMIN'] } } as any, {} as any) as UrlTree;
+    const canActivate = executeGuard({ data: { roles: ['admin'] } } as any, {} as any) as UrlTree;
 
     expect(canActivate).toBe(dummyUrlTree);
     expect(routerMock.createUrlTree).toHaveBeenCalledWith(['/dashboard'], {

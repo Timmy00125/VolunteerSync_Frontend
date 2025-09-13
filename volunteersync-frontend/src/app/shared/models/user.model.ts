@@ -27,7 +27,7 @@ export interface EmergencyContact {
 
 export enum UserRole {
   VOLUNTEER = 'VOLUNTEER',
-  COORDINATOR = 'COORDINATOR',
+  COORDINATOR = 'ORGANIZER',
   ADMIN = 'ADMIN',
 }
 

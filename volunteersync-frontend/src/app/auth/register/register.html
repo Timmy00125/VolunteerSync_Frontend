@@ -246,7 +246,47 @@
           }
         </div>
 
-        <!-- Role selection removed to align with backend schema (no role at registration) -->
+        <!-- Role Selection -->
+        <div>
+          <label for="role" [class]="validationService.getLabelClasses()">
+            I want to join as *
+          </label>
+          <div class="space-y-3 mt-2">
+            @for (option of roleOptions; track option.value) {
+            <div class="relative">
+              <input
+                type="radio"
+                id="role-{{ option.value }}"
+                name="role"
+                [value]="option.value"
+                formControlName="role"
+                class="sr-only peer"
+              />
+              <label
+                for="role-{{ option.value }}"
+                class="flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:border-blue-300 peer-checked:border-blue-500 peer-checked:bg-blue-50"
+              >
+                <div class="flex-1">
+                  <div class="font-medium text-gray-900">{{ option.label }}</div>
+                  <div class="text-sm text-gray-600 mt-1">{{ option.description }}</div>
+                </div>
+                <div class="ml-3">
+                  <div
+                    class="w-4 h-4 border-2 border-gray-300 rounded-full peer-checked:border-blue-500 peer-checked:bg-blue-500 flex items-center justify-center"
+                  >
+                    <div class="w-2 h-2 bg-white rounded-full peer-checked:bg-white"></div>
+                  </div>
+                </div>
+              </label>
+            </div>
+            }
+          </div>
+          @if (shouldShowFieldError('role')) {
+          <p [class]="validationService.getErrorClasses()">
+            {{ getFieldError('role') }}
+          </p>
+          }
+        </div>
 
         <!-- Terms and Conditions -->
         <div>

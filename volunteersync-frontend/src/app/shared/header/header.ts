@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../auth/services/auth';
-import { User } from '../models/user.model';
+import { User, UserRole } from '../models/user.model';
 import { CommonModule } from '@angular/common';
 
 interface NavigationItem {
@@ -43,16 +43,24 @@ export class HeaderComponent {
     ];
 
     // Add organizer-only items
-    if (user && this.hasRole(user, ['COORDINATOR', 'ADMIN'])) {
+    if (user && this.hasRole(user, [UserRole.COORDINATOR, UserRole.ADMIN])) {
       items.push(
-        { label: 'Create Event', route: '/events/create', roles: ['COORDINATOR', 'ADMIN'] },
-        { label: 'Manage Events', route: '/events/manage', roles: ['COORDINATOR', 'ADMIN'] }
+        {
+          label: 'Create Event',
+          route: '/events/create',
+          roles: [UserRole.COORDINATOR, UserRole.ADMIN],
+        },
+        {
+          label: 'Manage Events',
+          route: '/events/manage',
+          roles: [UserRole.COORDINATOR, UserRole.ADMIN],
+        }
       );
     }
 
     // Add admin-only items
-    if (user && this.hasRole(user, ['ADMIN'])) {
-      items.push({ label: 'Admin', route: '/admin', roles: ['ADMIN'] });
+    if (user && this.hasRole(user, [UserRole.ADMIN])) {
+      items.push({ label: 'Admin', route: '/admin', roles: [UserRole.ADMIN] });
     }
 
     return items;
