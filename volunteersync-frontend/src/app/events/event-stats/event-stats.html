@@ -1,0 +1,114 @@
+<div class="event-stats" [class]="'layout-' + layout()">
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="loading-container">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p class="loading-text">Loading statistics...</p>
+  </div>
+
+  <!-- Statistics Content -->
+  <div *ngIf="!loading() && statistics()" class="stats-container">
+    <!-- Primary Statistics -->
+    <div class="primary-stats">
+      <h3 class="section-title">Event Overview</h3>
+
+      <div class="stats-grid primary-grid">
+        <mat-card
+          *ngFor="let stat of primaryStats()"
+          class="stat-card"
+          [class]="'stat-' + stat.color"
+        >
+          <mat-card-content class="stat-content">
+            <div class="stat-header">
+              <mat-icon [class]="getStatIconColor(stat.color)">
+                {{ stat.icon }}
+              </mat-icon>
+              <span class="stat-title">{{ stat.title }}</span>
+            </div>
+
+            <div class="stat-value">
+              {{ stat.value }}
+            </div>
+
+            <div class="stat-subtitle" *ngIf="stat.subtitle">
+              {{ stat.subtitle }}
+            </div>
+
+            <!-- Trend indicator (future enhancement) -->
+            <div class="stat-trend" *ngIf="stat.trend">
+              <mat-icon [class]="'trend-' + stat.trend.direction">
+                {{
+                  stat.trend.direction === 'up'
+                    ? 'trending_up'
+                    : stat.trend.direction === 'down'
+                    ? 'trending_down'
+                    : 'trending_flat'
+                }}
+              </mat-icon>
+              <span class="trend-value">{{ stat.trend.value }}%</span>
+              <span class="trend-label">{{ stat.trend.label }}</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Detailed Statistics -->
+    <div *ngIf="hasDetailedStats()" class="detailed-stats">
+      <h3 class="section-title">Detailed Analytics</h3>
+
+      <div class="stats-grid detailed-grid">
+        <mat-card
+          *ngFor="let stat of detailedStats()"
+          class="stat-card detailed-card"
+          [class]="'stat-' + stat.color"
+        >
+          <mat-card-content class="stat-content">
+            <div class="stat-header">
+              <mat-icon [class]="getStatIconColor(stat.color)">
+                {{ stat.icon }}
+              </mat-icon>
+              <span class="stat-title">{{ stat.title }}</span>
+            </div>
+
+            <div class="stat-value">
+              {{ stat.value }}
+            </div>
+
+            <div class="stat-subtitle" *ngIf="stat.subtitle">
+              {{ stat.subtitle }}
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Quick Actions (future enhancement) -->
+    <div class="quick-actions" *ngIf="layout() === 'vertical'">
+      <h3 class="section-title">Quick Actions</h3>
+
+      <div class="action-buttons">
+        <button mat-stroked-button class="action-button">
+          <mat-icon>download</mat-icon>
+          Export Data
+        </button>
+
+        <button mat-stroked-button class="action-button">
+          <mat-icon>refresh</mat-icon>
+          Refresh Stats
+        </button>
+
+        <button mat-stroked-button class="action-button">
+          <mat-icon>share</mat-icon>
+          Share Report
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading() && !statistics()" class="empty-state">
+    <mat-icon class="empty-icon">analytics</mat-icon>
+    <h3>No Statistics Available</h3>
+    <p>Statistics will appear here once the event has registrations.</p>
+  </div>
+</div>

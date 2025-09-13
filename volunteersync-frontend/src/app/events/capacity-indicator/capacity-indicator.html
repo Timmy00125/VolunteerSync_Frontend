@@ -1,0 +1,64 @@
+<div
+  class="capacity-indicator"
+  [class.compact]="config().compact"
+  [class.at-capacity]="isAtCapacity()"
+  [class.near-capacity]="isNearCapacity()"
+>
+  <!-- Icon and Status Text -->
+  <div class="capacity-header" *ngIf="!config().compact">
+    <mat-icon
+      *ngIf="config().showIcon !== false"
+      [class]="'status-' + capacityStatus()"
+      [matTooltip]="tooltipText()"
+    >
+      {{ statusIcon() }}
+    </mat-icon>
+
+    <span class="status-text" [class]="'status-' + capacityStatus()">
+      {{ statusText() }}
+    </span>
+  </div>
+
+  <!-- Progress Bar -->
+  <mat-progress-bar
+    [mode]="'determinate'"
+    [value]="capacityPercentage()"
+    [color]="progressBarColor()"
+    [matTooltip]="tooltipText()"
+    class="capacity-progress"
+  >
+  </mat-progress-bar>
+
+  <!-- Compact Layout -->
+  <div class="compact-info" *ngIf="config().compact">
+    <span class="compact-text" [class]="'status-' + capacityStatus()">
+      {{ remainingSpots() }} spots
+    </span>
+    <span class="compact-percentage" *ngIf="config().showPercentage">
+      {{ capacityPercentage() | number : '1.0-0' }}%
+    </span>
+  </div>
+
+  <!-- Detailed Layout -->
+  <div class="detailed-info" *ngIf="!config().compact">
+    <!-- Spots Information -->
+    <div class="spots-info" *ngIf="config().showSpots !== false">
+      <span class="spots-available">
+        {{ remainingSpots() }} / {{ event().capacity.maximum }} available
+      </span>
+    </div>
+
+    <!-- Percentage Information -->
+    <div class="percentage-info" *ngIf="config().showPercentage">
+      <span class="percentage-value" [class]="'status-' + capacityStatus()">
+        {{ capacityPercentage() | number : '1.0-1' }}% full
+      </span>
+    </div>
+
+    <!-- Waitlist Info -->
+    <div class="waitlist-info" *ngIf="isAtCapacity() && event().capacity.waitlistEnabled">
+      <mat-icon class="waitlist-icon">queue</mat-icon>
+      <span class="waitlist-text">Waitlist available</span>
+    </div>
+  </div>
+</div>

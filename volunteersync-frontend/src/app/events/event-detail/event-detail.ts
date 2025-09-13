@@ -7,6 +7,8 @@ import { Subscription } from 'rxjs';
 import { EventService } from '../services/event';
 import { EventUiService } from '../services/event-ui';
 import { AuthService } from '../../auth/services/auth';
+import { EventErrorHandler } from '../services/event-error-handler';
+import { Breakpoint } from '../../shared/services/breakpoint';
 
 // Models
 import { Event, EventStatus } from '../../shared/models/event.model';
@@ -23,8 +25,10 @@ export class EventDetail implements OnInit, OnDestroy {
   private eventService = inject(EventService);
   private eventUiService = inject(EventUiService);
   private authService = inject(AuthService);
+  private eventErrorHandler = inject(EventErrorHandler);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private breakpointService = inject(Breakpoint);
 
   // Reactive state signals
   event = signal<Event | null>(null);
@@ -48,6 +52,13 @@ export class EventDetail implements OnInit, OnDestroy {
   isRegistered = computed(() => {
     return this.userRegistration() !== null;
   });
+
+  // Responsive design computed properties
+  isMobile = computed(() => this.breakpointService.isMobile());
+  isTablet = computed(() => this.breakpointService.isTablet());
+  isDesktop = computed(() => this.breakpointService.isDesktop());
+
+  showSidebar = computed(() => !this.isMobile());
 
   // Subscription for real-time updates
   private eventSubscription?: Subscription;
@@ -83,9 +94,11 @@ export class EventDetail implements OnInit, OnDestroy {
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('Error loading event:', err);
+        this.eventErrorHandler.handleEventOperationError(err, {
+          operation: 'view',
+          eventId,
+        });
         this.loading.set(false);
-        // TODO: Show error message
       },
     });
   }
@@ -126,8 +139,10 @@ export class EventDetail implements OnInit, OnDestroy {
         this.loadEvent(event.id);
       },
       error: (err) => {
-        console.error('Error registering for event:', err);
-        this.eventUiService.setError('Failed to register for the event. Please try again.');
+        this.eventErrorHandler.handleEventOperationError(err, {
+          operation: 'register',
+          eventId: event.id,
+        });
       },
     });
   }
@@ -147,8 +162,10 @@ export class EventDetail implements OnInit, OnDestroy {
         }
       },
       error: (err) => {
-        console.error('Error cancelling registration:', err);
-        this.eventUiService.setError('Failed to cancel registration. Please try again.');
+        this.eventErrorHandler.handleEventOperationError(err, {
+          operation: 'cancel',
+          eventId: registration.event.id,
+        });
       },
     });
   }
@@ -171,8 +188,10 @@ export class EventDetail implements OnInit, OnDestroy {
           this.router.navigate(['/events']);
         },
         error: (err) => {
-          console.error('Error deleting event:', err);
-          this.eventUiService.setError('Failed to delete event. Please try again.');
+          this.eventErrorHandler.handleEventOperationError(err, {
+            operation: 'delete',
+            eventId: event.id,
+          });
         },
       });
     }

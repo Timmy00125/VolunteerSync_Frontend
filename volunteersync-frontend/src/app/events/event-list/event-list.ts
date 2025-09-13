@@ -7,6 +7,8 @@ import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 // Services
 import { EventService } from '../services/event';
 import { EventUiService } from '../services/event-ui';
+import { EventErrorHandler } from '../services/event-error-handler';
+import { Breakpoint } from '../../shared/services/breakpoint';
 
 // Models
 import { Event, EventStatus } from '../../shared/models/event.model';
@@ -20,7 +22,9 @@ import { Event, EventStatus } from '../../shared/models/event.model';
 export class EventListComponent implements OnInit, OnDestroy {
   private eventService = inject(EventService);
   public eventUiService = inject(EventUiService);
+  private eventErrorHandler = inject(EventErrorHandler);
   private router = inject(Router);
+  private breakpointService = inject(Breakpoint);
   private destroy$ = new Subject<void>();
 
   // Make Math available in template
@@ -95,6 +99,22 @@ export class EventListComponent implements OnInit, OnDestroy {
   hasNextPage = computed(() => this.currentPage() < this.totalPages());
   hasPreviousPage = computed(() => this.currentPage() > 1);
 
+  // Responsive design computed properties
+  gridColumns = computed(() => {
+    return this.breakpointService.getResponsiveColumns({
+      xs: 1,
+      sm: 1,
+      md: 2,
+      lg: 3,
+      xl: 4,
+      '2xl': 5,
+    });
+  });
+
+  isMobile = computed(() => this.breakpointService.isMobile());
+  isTablet = computed(() => this.breakpointService.isTablet());
+  isDesktop = computed(() => this.breakpointService.isDesktop());
+
   ngOnInit(): void {
     this.loadEvents();
 
@@ -122,9 +142,9 @@ export class EventListComponent implements OnInit, OnDestroy {
         this.loading.set(false);
       },
       error: (err) => {
+        this.eventErrorHandler.handleEventOperationError(err, { operation: 'list' });
         this.error.set('Failed to load events. Please try again.');
         this.loading.set(false);
-        console.error('Error loading events:', err);
       },
     });
   }

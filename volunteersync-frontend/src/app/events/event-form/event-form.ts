@@ -8,6 +8,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { EventService } from '../services/event';
 import { EventUiService } from '../services/event-ui';
 import { AuthService } from '../../auth/services/auth';
+import { EventErrorHandler } from '../services/event-error-handler';
+import { Breakpoint } from '../../shared/services/breakpoint';
 
 // Models
 import {
@@ -51,9 +53,11 @@ export class EventForm implements OnInit, OnDestroy {
   private eventService = inject(EventService);
   public eventUiService = inject(EventUiService);
   private authService = inject(AuthService);
+  private eventErrorHandler = inject(EventErrorHandler);
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private breakpointService = inject(Breakpoint);
   private destroy$ = new Subject<void>();
 
   // Form and state
@@ -66,6 +70,22 @@ export class EventForm implements OnInit, OnDestroy {
   // Available options
   categories = signal<EventCategory[]>(Object.values(EventCategory));
   timeCommitments = signal<TimeCommitmentType[]>(Object.values(TimeCommitmentType));
+
+  // Responsive design computed properties
+  isMobile = computed(() => this.breakpointService.isMobile());
+  isTablet = computed(() => this.breakpointService.isTablet());
+  isDesktop = computed(() => this.breakpointService.isDesktop());
+
+  formColumns = computed(() => {
+    return this.breakpointService.getResponsiveColumns({
+      xs: 1,
+      sm: 1,
+      md: 2,
+      lg: 2,
+      xl: 2,
+      '2xl': 2,
+    });
+  });
 
   constructor() {
     this.eventForm = this.createEventForm();
@@ -147,8 +167,10 @@ export class EventForm implements OnInit, OnDestroy {
           this.loading.set(false);
         },
         error: (error) => {
-          console.error('Error loading event:', error);
-          this.eventUiService.setError('Failed to load event for editing');
+          this.eventErrorHandler.handleEventOperationError(error, {
+            operation: 'edit',
+            eventId,
+          });
           this.loading.set(false);
         },
       });
@@ -224,8 +246,10 @@ export class EventForm implements OnInit, OnDestroy {
           this.router.navigate(['/events', event.id]);
         },
         error: (error) => {
-          console.error('Error saving event:', error);
-          this.eventUiService.setError('Failed to save event. Please try again.');
+          this.eventErrorHandler.handleEventOperationError(error, {
+            operation: this.isEditMode() ? 'update' : 'create',
+            eventId: this.eventId() || undefined,
+          });
           this.loading.set(false);
         },
       });
