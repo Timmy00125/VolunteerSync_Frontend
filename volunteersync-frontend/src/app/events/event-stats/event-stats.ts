@@ -53,7 +53,6 @@ export interface StatCard {
     MatButtonModule,
   ],
   templateUrl: './event-stats.html',
-  styleUrl: './event-stats.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventStats implements OnInit {
@@ -252,5 +251,25 @@ export class EventStats implements OnInit {
       default:
         return 'text-blue-600';
     }
+  }
+
+  getStatCardClasses(color: StatCard['color']): string {
+    const colorMap: Record<StatCard['color'], string> = {
+      primary: 'border-l-4 border-l-blue-500',
+      accent: 'border-l-4 border-l-purple-500',
+      warn: 'border-l-4 border-l-orange-500',
+      success: 'border-l-4 border-l-green-500',
+      info: 'border-l-4 border-l-blue-500',
+    };
+    return colorMap[color] || 'border-l-4 border-l-gray-500';
+  }
+
+  getTrendClasses(direction: string): string {
+    const directionMap: Record<string, string> = {
+      up: 'text-green-600',
+      down: 'text-red-600',
+      stable: 'text-gray-600',
+    };
+    return directionMap[direction] || 'text-gray-600';
   }
 }

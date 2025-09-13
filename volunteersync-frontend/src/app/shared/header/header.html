@@ -20,7 +20,7 @@
         @for (item of navigationItems(); track item.route) {
         <a
           [routerLink]="item.route"
-          routerLinkActive="text-blue-600 border-b-2 border-blue-600"
+          routerLinkActive="!text-blue-600 !border-b-2 !border-blue-600"
           class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
         >
           {{ item.label }}
@@ -37,12 +37,12 @@
           <button
             type="button"
             (click)="toggleUserMenu()"
-            class="flex items-center space-x-3 text-sm bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 p-2 hover:bg-gray-50 transition-colors duration-200"
+            class="flex items-center space-x-3 text-sm bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 p-2 hover:bg-gray-50 transition-colors duration-200 group"
             [attr.aria-expanded]="userMenuOpen()"
             aria-haspopup="true"
           >
             <div
-              class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium text-sm"
+              class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium text-sm group-hover:scale-105 transition-transform duration-200"
             >
               {{ getUserInitials() }}
             </div>
@@ -65,7 +65,7 @@
           <!-- User dropdown menu -->
           @if (userMenuOpen()) {
           <div
-            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50"
+            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl py-1 ring-1 ring-black ring-opacity-5 z-50 animate-in slide-in-from-top-2 duration-150"
           >
             <button
               (click)="navigateToProfile()"
@@ -145,14 +145,16 @@
 
   <!-- Mobile menu -->
   @if (mobileMenuOpen()) {
-  <div class="md:hidden mobile-menu bg-white border-t border-gray-200">
+  <div
+    class="md:hidden mobile-menu bg-white border-t border-gray-200 animate-in slide-in-from-top-2 duration-300 backdrop-blur-sm"
+  >
     <div class="px-2 pt-2 pb-3 space-y-1">
       @if (isAuthenticated()) {
       <!-- Mobile navigation items -->
       @for (item of navigationItems(); track item.route) {
       <a
         [routerLink]="item.route"
-        routerLinkActive="router-link-active-mobile"
+        routerLinkActive="!bg-blue-50 !border-l-4 !border-blue-600 !text-blue-700"
         (click)="closeMenus()"
         class="text-gray-700 hover:bg-gray-50 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
       >

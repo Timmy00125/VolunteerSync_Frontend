@@ -1,41 +1,59 @@
-<div class="event-stats" [class]="'layout-' + layout()">
+<div
+  class="space-y-6 p-4"
+  [class.grid-cols-1]="layout() === 'vertical'"
+  [class.grid-cols-2]="layout() === 'horizontal'"
+  [class.lg:grid-cols-4]="layout() === 'horizontal'"
+>
   <!-- Loading State -->
-  <div *ngIf="loading()" class="loading-container">
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    <p class="loading-text">Loading statistics...</p>
+  <div *ngIf="loading()" class="flex flex-col items-center justify-center py-12 space-y-4">
+    <mat-progress-bar mode="indeterminate" class="w-48"></mat-progress-bar>
+    <p class="text-gray-600 text-sm">Loading statistics...</p>
   </div>
 
   <!-- Statistics Content -->
-  <div *ngIf="!loading() && statistics()" class="stats-container">
+  <div *ngIf="!loading() && statistics()" class="space-y-8">
     <!-- Primary Statistics -->
-    <div class="primary-stats">
-      <h3 class="section-title">Event Overview</h3>
+    <div class="space-y-4">
+      <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+        Event Overview
+      </h3>
 
-      <div class="stats-grid primary-grid">
+      <div
+        class="grid gap-4"
+        [class.grid-cols-1]="layout() === 'vertical'"
+        [class.sm:grid-cols-2]="layout() === 'vertical'"
+        [class.lg:grid-cols-4]="layout() === 'vertical'"
+        [class.grid-cols-2]="layout() === 'horizontal'"
+        [class.lg:grid-cols-4]="layout() === 'horizontal'"
+      >
         <mat-card
           *ngFor="let stat of primaryStats()"
-          class="stat-card"
-          [class]="'stat-' + stat.color"
+          class="shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200"
+          [class]="getStatCardClasses(stat.color)"
         >
-          <mat-card-content class="stat-content">
-            <div class="stat-header">
+          <mat-card-content class="p-6">
+            <div class="flex items-center gap-3 mb-3">
               <mat-icon [class]="getStatIconColor(stat.color)">
                 {{ stat.icon }}
               </mat-icon>
-              <span class="stat-title">{{ stat.title }}</span>
+              <span class="text-sm font-medium text-gray-700">{{ stat.title }}</span>
             </div>
 
-            <div class="stat-value">
+            <div class="text-2xl font-bold text-gray-900 mb-2">
               {{ stat.value }}
             </div>
 
-            <div class="stat-subtitle" *ngIf="stat.subtitle">
+            <div class="text-xs text-gray-500" *ngIf="stat.subtitle">
               {{ stat.subtitle }}
             </div>
 
             <!-- Trend indicator (future enhancement) -->
-            <div class="stat-trend" *ngIf="stat.trend">
-              <mat-icon [class]="'trend-' + stat.trend.direction">
+            <div
+              class="flex items-center gap-1 mt-2 text-xs"
+              *ngIf="stat.trend"
+              [class]="getTrendClasses(stat.trend.direction)"
+            >
+              <mat-icon class="!text-xs">
                 {{
                   stat.trend.direction === 'up'
                     ? 'trending_up'
@@ -44,8 +62,8 @@
                     : 'trending_flat'
                 }}
               </mat-icon>
-              <span class="trend-value">{{ stat.trend.value }}%</span>
-              <span class="trend-label">{{ stat.trend.label }}</span>
+              <span class="font-medium">{{ stat.trend.value }}%</span>
+              <span class="text-gray-600">{{ stat.trend.label }}</span>
             </div>
           </mat-card-content>
         </mat-card>
@@ -53,28 +71,37 @@
     </div>
 
     <!-- Detailed Statistics -->
-    <div *ngIf="hasDetailedStats()" class="detailed-stats">
-      <h3 class="section-title">Detailed Analytics</h3>
+    <div *ngIf="hasDetailedStats()" class="space-y-4">
+      <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+        Detailed Analytics
+      </h3>
 
-      <div class="stats-grid detailed-grid">
+      <div
+        class="grid gap-4"
+        [class.grid-cols-1]="layout() === 'vertical'"
+        [class.sm:grid-cols-2]="layout() === 'vertical'"
+        [class.lg:grid-cols-3]="layout() === 'vertical'"
+        [class.grid-cols-2]="layout() === 'horizontal'"
+        [class.lg:grid-cols-3]="layout() === 'horizontal'"
+      >
         <mat-card
           *ngFor="let stat of detailedStats()"
-          class="stat-card detailed-card"
-          [class]="'stat-' + stat.color"
+          class="shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200"
+          [class]="getStatCardClasses(stat.color)"
         >
-          <mat-card-content class="stat-content">
-            <div class="stat-header">
+          <mat-card-content class="p-6">
+            <div class="flex items-center gap-3 mb-3">
               <mat-icon [class]="getStatIconColor(stat.color)">
                 {{ stat.icon }}
               </mat-icon>
-              <span class="stat-title">{{ stat.title }}</span>
+              <span class="text-sm font-medium text-gray-700">{{ stat.title }}</span>
             </div>
 
-            <div class="stat-value">
+            <div class="text-xl font-bold text-gray-900 mb-2">
               {{ stat.value }}
             </div>
 
-            <div class="stat-subtitle" *ngIf="stat.subtitle">
+            <div class="text-xs text-gray-500" *ngIf="stat.subtitle">
               {{ stat.subtitle }}
             </div>
           </mat-card-content>
@@ -83,32 +110,48 @@
     </div>
 
     <!-- Quick Actions (future enhancement) -->
-    <div class="quick-actions" *ngIf="layout() === 'vertical'">
-      <h3 class="section-title">Quick Actions</h3>
+    <div class="space-y-4" *ngIf="layout() === 'vertical'">
+      <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+        Quick Actions
+      </h3>
 
-      <div class="action-buttons">
-        <button mat-stroked-button class="action-button">
-          <mat-icon>download</mat-icon>
-          Export Data
+      <div class="flex flex-wrap gap-3">
+        <button
+          mat-stroked-button
+          class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+        >
+          <mat-icon class="text-gray-600">download</mat-icon>
+          <span class="text-gray-700">Export Data</span>
         </button>
 
-        <button mat-stroked-button class="action-button">
-          <mat-icon>refresh</mat-icon>
-          Refresh Stats
+        <button
+          mat-stroked-button
+          class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+        >
+          <mat-icon class="text-gray-600">refresh</mat-icon>
+          <span class="text-gray-700">Refresh Stats</span>
         </button>
 
-        <button mat-stroked-button class="action-button">
-          <mat-icon>share</mat-icon>
-          Share Report
+        <button
+          mat-stroked-button
+          class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+        >
+          <mat-icon class="text-gray-600">share</mat-icon>
+          <span class="text-gray-700">Share Report</span>
         </button>
       </div>
     </div>
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!loading() && !statistics()" class="empty-state">
-    <mat-icon class="empty-icon">analytics</mat-icon>
-    <h3>No Statistics Available</h3>
-    <p>Statistics will appear here once the event has registrations.</p>
+  <div
+    *ngIf="!loading() && !statistics()"
+    class="flex flex-col items-center justify-center py-16 space-y-4 text-center"
+  >
+    <mat-icon class="text-6xl text-gray-400 mb-4">analytics</mat-icon>
+    <h3 class="text-lg font-medium text-gray-900">No Statistics Available</h3>
+    <p class="text-gray-600 max-w-sm">
+      Statistics will appear here once the event has registrations.
+    </p>
   </div>
 </div>

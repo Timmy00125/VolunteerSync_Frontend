@@ -154,6 +154,38 @@ export class CapacityIndicator implements OnInit, OnDestroy {
     }
   }
 
+  // Helper methods for Tailwind CSS classes
+  getStatusIconClasses(): string {
+    const status = this.capacityStatus();
+    const baseClasses = 'text-base';
+
+    switch (status) {
+      case 'normal':
+        return `${baseClasses} text-green-600 dark:text-green-400`;
+      case 'warning':
+        return `${baseClasses} text-orange-600 dark:text-orange-400`;
+      case 'critical':
+        return `${baseClasses} text-red-600 dark:text-red-400`;
+      default:
+        return `${baseClasses} text-gray-600 dark:text-gray-400`;
+    }
+  }
+
+  getStatusTextClasses(): string {
+    const status = this.capacityStatus();
+
+    switch (status) {
+      case 'normal':
+        return 'text-green-700 dark:text-green-400';
+      case 'warning':
+        return 'text-orange-700 dark:text-orange-400';
+      case 'critical':
+        return 'text-red-700 dark:text-red-400';
+      default:
+        return 'text-gray-700 dark:text-gray-400';
+    }
+  }
+
   ngOnDestroy(): void {
     this.stopRealtimeTracking();
   }

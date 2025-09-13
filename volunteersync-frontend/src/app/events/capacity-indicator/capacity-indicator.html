@@ -1,20 +1,19 @@
 <div
-  class="capacity-indicator"
-  [class.compact]="config().compact"
-  [class.at-capacity]="isAtCapacity()"
-  [class.near-capacity]="isNearCapacity()"
+  class="flex flex-col gap-2 w-full"
+  [class]="config().compact ? 'flex-row items-center gap-3' : 'flex-col gap-2'"
+  [class.opacity-90]="isAtCapacity()"
 >
   <!-- Icon and Status Text -->
-  <div class="capacity-header" *ngIf="!config().compact">
+  <div class="flex items-center gap-2 sm:gap-1" *ngIf="!config().compact">
     <mat-icon
       *ngIf="config().showIcon !== false"
-      [class]="'status-' + capacityStatus()"
+      [class]="getStatusIconClasses()"
       [matTooltip]="tooltipText()"
     >
       {{ statusIcon() }}
     </mat-icon>
 
-    <span class="status-text" [class]="'status-' + capacityStatus()">
+    <span class="text-sm font-medium sm:text-xs" [class]="getStatusTextClasses()">
       {{ statusText() }}
     </span>
   </div>
@@ -25,40 +24,46 @@
     [value]="capacityPercentage()"
     [color]="progressBarColor()"
     [matTooltip]="tooltipText()"
-    class="capacity-progress"
+    [class]="
+      config().compact
+        ? 'flex-1 h-1.5 rounded-full overflow-hidden'
+        : 'h-2 rounded-full overflow-hidden'
+    "
+    [class.animate-pulse]="isNearCapacity()"
   >
   </mat-progress-bar>
 
   <!-- Compact Layout -->
-  <div class="compact-info" *ngIf="config().compact">
-    <span class="compact-text" [class]="'status-' + capacityStatus()">
-      {{ remainingSpots() }} spots
-    </span>
-    <span class="compact-percentage" *ngIf="config().showPercentage">
+  <div class="flex items-center gap-2 text-xs sm:gap-1" *ngIf="config().compact">
+    <span class="font-medium" [class]="getStatusTextClasses()"> {{ remainingSpots() }} spots </span>
+    <span class="text-gray-600 dark:text-gray-400" *ngIf="config().showPercentage">
       {{ capacityPercentage() | number : '1.0-0' }}%
     </span>
   </div>
 
   <!-- Detailed Layout -->
-  <div class="detailed-info" *ngIf="!config().compact">
+  <div class="flex flex-col gap-1 text-xs" *ngIf="!config().compact">
     <!-- Spots Information -->
-    <div class="spots-info" *ngIf="config().showSpots !== false">
-      <span class="spots-available">
+    <div class="flex justify-between items-center" *ngIf="config().showSpots !== false">
+      <span class="text-gray-700 dark:text-gray-300">
         {{ remainingSpots() }} / {{ event().capacity.maximum }} available
       </span>
     </div>
 
     <!-- Percentage Information -->
-    <div class="percentage-info" *ngIf="config().showPercentage">
-      <span class="percentage-value" [class]="'status-' + capacityStatus()">
+    <div class="flex justify-end" *ngIf="config().showPercentage">
+      <span class="font-medium" [class]="getStatusTextClasses()">
         {{ capacityPercentage() | number : '1.0-1' }}% full
       </span>
     </div>
 
     <!-- Waitlist Info -->
-    <div class="waitlist-info" *ngIf="isAtCapacity() && event().capacity.waitlistEnabled">
-      <mat-icon class="waitlist-icon">queue</mat-icon>
-      <span class="waitlist-text">Waitlist available</span>
+    <div
+      class="flex items-center gap-1 mt-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/20 rounded text-blue-800 dark:text-blue-300"
+      *ngIf="isAtCapacity() && event().capacity.waitlistEnabled"
+    >
+      <mat-icon class="text-sm">queue</mat-icon>
+      <span class="text-xs font-medium">Waitlist available</span>
     </div>
   </div>
 </div>

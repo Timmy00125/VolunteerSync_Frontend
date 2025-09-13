@@ -1,13 +1,20 @@
-<div class="organizer-dashboard">
+<div class="max-w-screen-xl mx-auto p-6">
   <!-- Dashboard Header -->
-  <div class="dashboard-header">
-    <div class="header-content">
-      <h1 class="dashboard-title">Organizer Dashboard</h1>
-      <p class="dashboard-subtitle">Manage your events and track performance</p>
+  <div class="flex justify-between items-start mb-8 gap-4 flex-col lg:flex-row lg:items-start">
+    <div class="flex-1">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2 dark:text-gray-100">Organizer Dashboard</h1>
+      <p class="text-gray-600 text-base dark:text-gray-400">
+        Manage your events and track performance
+      </p>
     </div>
 
-    <div class="header-actions">
-      <button mat-raised-button color="primary" (click)="onCreateEvent()" class="create-button">
+    <div class="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-end">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onCreateEvent()"
+        class="flex items-center gap-2"
+      >
         <mat-icon>add</mat-icon>
         Create Event
       </button>
@@ -30,106 +37,143 @@
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="loading()" class="loading-container">
+  <div *ngIf="loading()" class="flex flex-col items-center gap-4 py-12">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    <p class="loading-text">Loading dashboard...</p>
+    <p class="text-gray-600 text-sm dark:text-gray-400">Loading dashboard...</p>
   </div>
 
   <!-- Dashboard Content -->
-  <div *ngIf="!loading()" class="dashboard-content">
+  <div *ngIf="!loading()" class="flex flex-col gap-8">
     <!-- Overview Cards -->
-    <div class="overview-section">
-      <h2 class="section-title">Overview</h2>
+    <div class="mb-4">
+      <h2 class="text-2xl font-semibold text-gray-700 mb-6 dark:text-gray-300">Overview</h2>
 
-      <div class="stats-grid">
-        <mat-card class="stat-card primary-card">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <mat-card
+          class="rounded-xl transition-all duration-200 hover:-translate-y-1 hover:shadow-lg border-l-4 border-blue-600"
+        >
           <mat-card-content>
-            <div class="stat-header">
-              <mat-icon class="stat-icon">event</mat-icon>
-              <span class="stat-label">Total Events</span>
+            <div class="flex items-center gap-3 mb-4">
+              <mat-icon class="text-2xl w-6 h-6 text-blue-600">event</mat-icon>
+              <span class="text-sm font-medium text-gray-600">Total Events</span>
             </div>
-            <div class="stat-value">{{ dashboardStats().totalEvents }}</div>
-            <div class="stat-detail">{{ dashboardStats().activeEvents }} active</div>
+            <div class="text-4xl font-bold text-blue-600 leading-none mb-2">
+              {{ dashboardStats().totalEvents }}
+            </div>
+            <div class="text-xs text-gray-500">{{ dashboardStats().activeEvents }} active</div>
           </mat-card-content>
         </mat-card>
 
-        <mat-card class="stat-card success-card">
+        <mat-card
+          class="rounded-xl transition-all duration-200 hover:-translate-y-1 hover:shadow-lg border-l-4 border-green-600"
+        >
           <mat-card-content>
-            <div class="stat-header">
-              <mat-icon class="stat-icon">people</mat-icon>
-              <span class="stat-label">Total Registrations</span>
+            <div class="flex items-center gap-3 mb-4">
+              <mat-icon class="text-2xl w-6 h-6 text-green-600">people</mat-icon>
+              <span class="text-sm font-medium text-gray-600">Total Registrations</span>
             </div>
-            <div class="stat-value">{{ dashboardStats().totalRegistrations }}</div>
-            <div class="stat-detail">Across all events</div>
+            <div class="text-4xl font-bold text-green-600 leading-none mb-2">
+              {{ dashboardStats().totalRegistrations }}
+            </div>
+            <div class="text-xs text-gray-500">Across all events</div>
           </mat-card-content>
         </mat-card>
 
-        <mat-card class="stat-card accent-card">
+        <mat-card
+          class="rounded-xl transition-all duration-200 hover:-translate-y-1 hover:shadow-lg border-l-4 border-purple-600"
+        >
           <mat-card-content>
-            <div class="stat-header">
-              <mat-icon class="stat-icon">analytics</mat-icon>
-              <span class="stat-label">Avg. Capacity</span>
+            <div class="flex items-center gap-3 mb-4">
+              <mat-icon class="text-2xl w-6 h-6 text-purple-600">analytics</mat-icon>
+              <span class="text-sm font-medium text-gray-600">Avg. Capacity</span>
             </div>
-            <div class="stat-value">
+            <div class="text-4xl font-bold text-purple-600 leading-none mb-2">
               {{ dashboardStats().averageCapacityUtilization | number : '1.0-0' }}%
             </div>
-            <div class="stat-detail">Utilization rate</div>
+            <div class="text-xs text-gray-500">Utilization rate</div>
           </mat-card-content>
         </mat-card>
 
-        <mat-card class="stat-card warn-card" *ngIf="dashboardStats().eventsNeedingAttention > 0">
+        <mat-card
+          class="rounded-xl transition-all duration-200 hover:-translate-y-1 hover:shadow-lg border-l-4 border-red-600"
+          *ngIf="dashboardStats().eventsNeedingAttention > 0"
+        >
           <mat-card-content>
-            <div class="stat-header">
-              <mat-icon class="stat-icon">warning</mat-icon>
-              <span class="stat-label">Need Attention</span>
+            <div class="flex items-center gap-3 mb-4">
+              <mat-icon class="text-2xl w-6 h-6 text-red-600">warning</mat-icon>
+              <span class="text-sm font-medium text-gray-600">Need Attention</span>
             </div>
-            <div class="stat-value">{{ dashboardStats().eventsNeedingAttention }}</div>
-            <div class="stat-detail">Events requiring action</div>
+            <div class="text-4xl font-bold text-red-600 leading-none mb-2">
+              {{ dashboardStats().eventsNeedingAttention }}
+            </div>
+            <div class="text-xs text-gray-500">Events requiring action</div>
           </mat-card-content>
         </mat-card>
       </div>
     </div>
 
     <!-- Event Management Tabs -->
-    <div class="events-section">
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden dark:bg-gray-800">
       <mat-tab-group
         (selectedTabChange)="onTabChanged($event.index)"
         [selectedIndex]="selectedTabIndex()"
-        class="events-tabs"
+        class="min-h-96"
       >
         <!-- Recent Events Tab -->
         <mat-tab label="Recent Events">
-          <div class="tab-content">
-            <div class="tab-header">
-              <h3 class="tab-title">Recently Created Events</h3>
-              <span class="tab-count">{{ recentEvents().length }} events</span>
+          <div class="p-6">
+            <div
+              class="flex justify-between items-center mb-6 flex-col sm:flex-row sm:items-center gap-2"
+            >
+              <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">
+                Recently Created Events
+              </h3>
+              <span
+                class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full dark:bg-gray-700 dark:text-gray-300"
+                >{{ recentEvents().length }} events</span
+              >
             </div>
 
-            <div class="events-list" *ngIf="recentEvents().length > 0; else noRecentEvents">
+            <div class="flex flex-col gap-4" *ngIf="recentEvents().length > 0; else noRecentEvents">
               <mat-card
                 *ngFor="let event of recentEvents()"
-                class="event-card"
-                [class.needs-attention]="event.needsAttention"
+                class="rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                [class.border-l-4]="event.needsAttention"
+                [class.border-red-600]="event.needsAttention"
               >
-                <mat-card-content class="event-content">
-                  <div class="event-info">
-                    <h4 class="event-title">{{ event.title }}</h4>
-                    <p class="event-date">{{ formatDate(event.startTime) }}</p>
-                    <p class="event-location">{{ event.location.name }}</p>
+                <mat-card-content
+                  class="flex items-center gap-4 p-4 flex-col lg:flex-row lg:items-center"
+                >
+                  <div class="flex-1 min-w-0 w-full lg:w-auto">
+                    <h4
+                      class="text-lg font-semibold text-gray-900 mb-2 truncate dark:text-gray-100"
+                    >
+                      {{ event.title }}
+                    </h4>
+                    <p class="text-sm text-gray-600 mb-1 dark:text-gray-400">
+                      {{ formatDate(event.startTime) }}
+                    </p>
+                    <p class="text-sm text-gray-600 mb-1 dark:text-gray-400">
+                      {{ event.location.name }}
+                    </p>
 
-                    <div class="event-status">
+                    <div class="flex gap-2 flex-wrap mt-2">
                       <mat-chip [color]="getStatusColor(event.status)">
                         {{ getStatusText(event.status) }}
                       </mat-chip>
 
-                      <mat-chip *ngIf="event.needsAttention" color="warn" class="attention-chip">
+                      <mat-chip
+                        *ngIf="event.needsAttention"
+                        color="warn"
+                        class="flex items-center gap-1"
+                      >
                         <mat-icon>warning</mat-icon>
                         {{ event.attentionReason }}
                       </mat-chip>
                     </div>
                   </div>
 
-                  <div class="event-metrics">
+                  <div class="flex-shrink-0 min-w-48 w-full lg:w-48">
                     <app-capacity-indicator
                       [event]="event"
                       [config]="{ compact: true, showPercentage: true }"
@@ -138,7 +182,9 @@
                     </app-capacity-indicator>
                   </div>
 
-                  <div class="event-actions">
+                  <div
+                    class="flex gap-2 flex-shrink-0 w-full lg:w-auto justify-between lg:justify-end"
+                  >
                     <button mat-button (click)="onViewEvent(event)">
                       <mat-icon>visibility</mat-icon>
                       View
@@ -157,10 +203,12 @@
             </div>
 
             <ng-template #noRecentEvents>
-              <div class="empty-state">
-                <mat-icon class="empty-icon">event_note</mat-icon>
-                <h3>No Recent Events</h3>
-                <p>You haven't created any events recently.</p>
+              <div
+                class="flex flex-col items-center justify-center py-12 px-8 text-center text-gray-600"
+              >
+                <mat-icon class="text-6xl w-16 h-16 mb-4 text-gray-300">event_note</mat-icon>
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">No Recent Events</h3>
+                <p class="text-sm mb-6 max-w-96">You haven't created any events recently.</p>
                 <button mat-raised-button color="primary" (click)="onCreateEvent()">
                   Create Your First Event
                 </button>
@@ -171,22 +219,45 @@
 
         <!-- Upcoming Events Tab -->
         <mat-tab label="Upcoming Events">
-          <div class="tab-content">
-            <div class="tab-header">
-              <h3 class="tab-title">Upcoming Events</h3>
-              <span class="tab-count">{{ upcomingEvents().length }} events</span>
+          <div class="p-6">
+            <div
+              class="flex justify-between items-center mb-6 flex-col sm:flex-row sm:items-center gap-2"
+            >
+              <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">
+                Upcoming Events
+              </h3>
+              <span
+                class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full dark:bg-gray-700 dark:text-gray-300"
+                >{{ upcomingEvents().length }} events</span
+              >
             </div>
 
-            <div class="events-list" *ngIf="upcomingEvents().length > 0; else noUpcomingEvents">
-              <mat-card *ngFor="let event of upcomingEvents()" class="event-card">
-                <mat-card-content class="event-content">
-                  <div class="event-info">
-                    <h4 class="event-title">{{ event.title }}</h4>
-                    <p class="event-date">{{ formatDate(event.startTime) }}</p>
-                    <p class="event-location">{{ event.location.name }}</p>
+            <div
+              class="flex flex-col gap-4"
+              *ngIf="upcomingEvents().length > 0; else noUpcomingEvents"
+            >
+              <mat-card
+                *ngFor="let event of upcomingEvents()"
+                class="rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <mat-card-content
+                  class="flex items-center gap-4 p-4 flex-col lg:flex-row lg:items-center"
+                >
+                  <div class="flex-1 min-w-0 w-full lg:w-auto">
+                    <h4
+                      class="text-lg font-semibold text-gray-900 mb-2 truncate dark:text-gray-100"
+                    >
+                      {{ event.title }}
+                    </h4>
+                    <p class="text-sm text-gray-600 mb-1 dark:text-gray-400">
+                      {{ formatDate(event.startTime) }}
+                    </p>
+                    <p class="text-sm text-gray-600 mb-1 dark:text-gray-400">
+                      {{ event.location.name }}
+                    </p>
                   </div>
 
-                  <div class="event-metrics">
+                  <div class="flex-shrink-0 min-w-48 w-full lg:w-48">
                     <app-capacity-indicator
                       [event]="event"
                       [config]="{ compact: true, showPercentage: true }"
@@ -195,7 +266,9 @@
                     </app-capacity-indicator>
                   </div>
 
-                  <div class="event-actions">
+                  <div
+                    class="flex gap-2 flex-shrink-0 w-full lg:w-auto justify-between lg:justify-end"
+                  >
                     <button mat-button (click)="onViewEvent(event)">
                       <mat-icon>visibility</mat-icon>
                       View
@@ -210,10 +283,12 @@
             </div>
 
             <ng-template #noUpcomingEvents>
-              <div class="empty-state">
-                <mat-icon class="empty-icon">schedule</mat-icon>
-                <h3>No Upcoming Events</h3>
-                <p>You don't have any upcoming events scheduled.</p>
+              <div
+                class="flex flex-col items-center justify-center py-12 px-8 text-center text-gray-600"
+              >
+                <mat-icon class="text-6xl w-16 h-16 mb-4 text-gray-300">schedule</mat-icon>
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">No Upcoming Events</h3>
+                <p class="text-sm mb-6 max-w-96">You don't have any upcoming events scheduled.</p>
                 <button mat-raised-button color="primary" (click)="onCreateEvent()">
                   Schedule New Event
                 </button>
@@ -224,31 +299,44 @@
 
         <!-- Events Needing Attention Tab -->
         <mat-tab label="Needs Attention" *ngIf="eventsNeedingAttention().length > 0">
-          <div class="tab-content">
-            <div class="tab-header">
-              <h3 class="tab-title">Events Needing Attention</h3>
-              <span class="tab-count attention-count"
+          <div class="p-6">
+            <div
+              class="flex justify-between items-center mb-6 flex-col sm:flex-row sm:items-center gap-2"
+            >
+              <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">
+                Events Needing Attention
+              </h3>
+              <span
+                class="text-sm text-red-600 bg-red-50 px-3 py-1 rounded-full dark:bg-red-900/20 dark:text-red-400"
                 >{{ eventsNeedingAttention().length }} events</span
               >
             </div>
 
-            <div class="events-list">
+            <div class="flex flex-col gap-4">
               <mat-card
                 *ngFor="let event of eventsNeedingAttention()"
-                class="event-card attention-card"
+                class="rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md border-l-4 border-red-600 bg-red-50 dark:bg-red-900/10"
               >
-                <mat-card-content class="event-content">
-                  <div class="event-info">
-                    <h4 class="event-title">{{ event.title }}</h4>
-                    <p class="event-date">{{ formatDate(event.startTime) }}</p>
+                <mat-card-content
+                  class="flex items-center gap-4 p-4 flex-col lg:flex-row lg:items-center"
+                >
+                  <div class="flex-1 min-w-0 w-full lg:w-auto">
+                    <h4
+                      class="text-lg font-semibold text-gray-900 mb-2 truncate dark:text-gray-100"
+                    >
+                      {{ event.title }}
+                    </h4>
+                    <p class="text-sm text-gray-600 mb-1 dark:text-gray-400">
+                      {{ formatDate(event.startTime) }}
+                    </p>
 
-                    <div class="attention-reason">
-                      <mat-icon class="warning-icon">warning</mat-icon>
+                    <div class="flex items-center gap-2 text-red-600 text-sm mt-2">
+                      <mat-icon class="text-base w-4 h-4">warning</mat-icon>
                       <span>{{ event.attentionReason }}</span>
                     </div>
                   </div>
 
-                  <div class="event-metrics">
+                  <div class="flex-shrink-0 min-w-48 w-full lg:w-48">
                     <app-capacity-indicator
                       [event]="event"
                       [config]="{ compact: true, showPercentage: true }"
@@ -257,7 +345,9 @@
                     </app-capacity-indicator>
                   </div>
 
-                  <div class="event-actions">
+                  <div
+                    class="flex gap-2 flex-shrink-0 w-full lg:w-auto justify-between lg:justify-end"
+                  >
                     <button mat-raised-button color="warn" (click)="onManageEvent(event)">
                       <mat-icon>settings</mat-icon>
                       Resolve
@@ -271,22 +361,36 @@
 
         <!-- All Events Tab -->
         <mat-tab label="All Events">
-          <div class="tab-content">
-            <div class="tab-header">
-              <h3 class="tab-title">All Your Events</h3>
-              <span class="tab-count">{{ organizerEvents().length }} events</span>
+          <div class="p-6">
+            <div
+              class="flex justify-between items-center mb-6 flex-col sm:flex-row sm:items-center gap-2"
+            >
+              <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">
+                All Your Events
+              </h3>
+              <span
+                class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full dark:bg-gray-700 dark:text-gray-300"
+                >{{ organizerEvents().length }} events</span
+              >
             </div>
 
             <!-- Events Table -->
-            <div class="events-table-container" *ngIf="organizerEvents().length > 0">
-              <table mat-table [dataSource]="organizerEvents()" class="events-table">
+            <div
+              class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700"
+              *ngIf="organizerEvents().length > 0"
+            >
+              <table mat-table [dataSource]="organizerEvents()" class="w-full">
                 <!-- Title Column -->
                 <ng-container matColumnDef="title">
                   <th mat-header-cell *matHeaderCellDef>Event</th>
                   <td mat-cell *matCellDef="let event">
-                    <div class="event-cell">
-                      <span class="event-name">{{ event.title }}</span>
-                      <span class="event-location-small">{{ event.location.name }}</span>
+                    <div class="flex flex-col gap-1">
+                      <span class="font-medium text-gray-900 dark:text-gray-100">{{
+                        event.title
+                      }}</span>
+                      <span class="text-xs text-gray-600 dark:text-gray-400">{{
+                        event.location.name
+                      }}</span>
                     </div>
                   </td>
                 </ng-container>
@@ -303,11 +407,11 @@
                 <ng-container matColumnDef="capacity">
                   <th mat-header-cell *matHeaderCellDef>Capacity</th>
                   <td mat-cell *matCellDef="let event">
-                    <div class="capacity-cell">
+                    <div class="flex flex-col gap-2 min-w-32">
                       <span>{{ event.capacity.current }} / {{ event.capacity.maximum }}</span>
                       <mat-progress-bar
                         [value]="(event.capacity.current / event.capacity.maximum) * 100"
-                        class="capacity-bar"
+                        class="h-1 rounded-sm"
                       >
                       </mat-progress-bar>
                     </div>
@@ -355,10 +459,13 @@
             </div>
 
             <!-- Empty State for All Events -->
-            <div *ngIf="organizerEvents().length === 0" class="empty-state">
-              <mat-icon class="empty-icon">event_busy</mat-icon>
-              <h3>No Events Found</h3>
-              <p>You haven't created any events yet.</p>
+            <div
+              *ngIf="organizerEvents().length === 0"
+              class="flex flex-col items-center justify-center py-12 px-8 text-center text-gray-600"
+            >
+              <mat-icon class="text-6xl w-16 h-16 mb-4 text-gray-300">event_busy</mat-icon>
+              <h3 class="text-xl font-semibold mb-2 text-gray-700">No Events Found</h3>
+              <p class="text-sm mb-6 max-w-96">You haven't created any events yet.</p>
               <button mat-raised-button color="primary" (click)="onCreateEvent()">
                 Create Your First Event
               </button>
@@ -368,33 +475,51 @@
 
         <!-- Analytics Tab -->
         <mat-tab label="Analytics">
-          <div class="tab-content">
-            <div class="tab-header">
-              <h3 class="tab-title">Event Analytics</h3>
-              <span class="tab-count">{{ organizerEvents().length }} events analyzed</span>
+          <div class="p-6">
+            <div
+              class="flex justify-between items-center mb-6 flex-col sm:flex-row sm:items-center gap-2"
+            >
+              <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">
+                Event Analytics
+              </h3>
+              <span
+                class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full dark:bg-gray-700 dark:text-gray-300"
+                >{{ organizerEvents().length }} events analyzed</span
+              >
             </div>
 
             <div
-              class="analytics-container"
+              class="flex flex-col gap-8"
               *ngIf="organizerEvents().length > 0; else noAnalyticsData"
             >
-              <div *ngFor="let event of organizerEvents()" class="event-analytics-section">
-                <h4 class="event-analytics-title">{{ event.title }}</h4>
+              <div
+                *ngFor="let event of organizerEvents()"
+                class="bg-gray-50 rounded-lg p-6 border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+              >
+                <h4
+                  class="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b-2 border-gray-200 dark:text-gray-100 dark:border-gray-700"
+                >
+                  {{ event.title }}
+                </h4>
                 <app-event-stats
                   [event]="event"
                   [showDetailedStats]="true"
                   [layout]="'grid'"
-                  class="event-stats-widget"
+                  class="block"
                 >
                 </app-event-stats>
               </div>
             </div>
 
             <ng-template #noAnalyticsData>
-              <div class="empty-state">
-                <mat-icon class="empty-icon">analytics</mat-icon>
-                <h3>No Analytics Data</h3>
-                <p>Create events to see detailed analytics and insights.</p>
+              <div
+                class="flex flex-col items-center justify-center py-12 px-8 text-center text-gray-600"
+              >
+                <mat-icon class="text-6xl w-16 h-16 mb-4 text-gray-300">analytics</mat-icon>
+                <h3 class="text-xl font-semibold mb-2 text-gray-700">No Analytics Data</h3>
+                <p class="text-sm mb-6 max-w-96">
+                  Create events to see detailed analytics and insights.
+                </p>
                 <button mat-raised-button color="primary" (click)="onCreateEvent()">
                   Create Event
                 </button>
