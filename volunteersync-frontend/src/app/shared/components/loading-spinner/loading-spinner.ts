@@ -10,8 +10,10 @@ import { CommonModule } from '@angular/common';
 })
 export class LoadingSpinnerComponent {
   size = input<'sm' | 'md' | 'lg'>('md');
-  color = input<'primary' | 'white' | 'gray'>('primary');
+  color = input<'primary' | 'blue' | 'white' | 'gray'>('primary');
   text = input<string>('');
+  message = input<string>(''); // Backward compatibility
+  fullScreen = input<boolean>(false);
 
   get sizeClasses(): string {
     const sizes = {
@@ -25,9 +27,14 @@ export class LoadingSpinnerComponent {
   get colorClasses(): string {
     const colors = {
       primary: 'text-blue-600',
+      blue: 'text-blue-600', // Map blue to primary for consistency
       white: 'text-white',
       gray: 'text-gray-600',
     };
     return colors[this.color()];
+  }
+
+  get displayText(): string {
+    return this.text() || this.message();
   }
 }

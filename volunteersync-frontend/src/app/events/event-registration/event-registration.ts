@@ -15,7 +15,7 @@ import { User } from '../../shared/models/user.model';
 import { RegisterForEventInput } from '../../shared/models/registration.model';
 
 // Components
-import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner';
 import {
   ConfirmDialogComponent,
   ConfirmDialogData,
