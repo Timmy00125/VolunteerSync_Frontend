@@ -1,0 +1,194 @@
+<div class="max-w-4xl mx-auto p-6">
+  @if (isLoading()) {
+  <div class="flex flex-col items-center justify-center p-12 text-center">
+    <mat-spinner class="mb-4"></mat-spinner>
+    <p class="text-gray-600">Loading profile...</p>
+  </div>
+  } @else if (error()) {
+  <div class="flex flex-col items-center justify-center p-12 text-center">
+    <mat-icon color="warn" class="text-5xl w-12 h-12 mb-4">error</mat-icon>
+    <p class="text-red-600 mb-4">{{ error() }}</p>
+    <button mat-raised-button color="primary" (click)="loadProfile()">Retry</button>
+  </div>
+  } @else {
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+      <h1 class="text-3xl font-semibold text-gray-900 m-0">Edit Profile</h1>
+      <div class="flex items-center gap-3">
+        <button type="button" mat-button (click)="onCancel()">Cancel</button>
+        <button
+          type="submit"
+          mat-raised-button
+          color="primary"
+          [disabled]="!profileForm.valid || isSaving()"
+          class="flex items-center gap-2"
+        >
+          @if (isSaving()) {
+          <mat-spinner diameter="20"></mat-spinner>
+          Saving... } @else { Save Changes }
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <mat-tab-group [(selectedIndex)]="activeTab" class="mb-6">
+      <!-- Basic Information Tab -->
+      <mat-tab label="Basic Info">
+        <div class="py-6">
+          <mat-card class="mb-6">
+            <mat-card-header>
+              <mat-card-title>Basic Information</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="grid grid-cols-1 gap-4">
+                <mat-form-field appearance="outline">
+                  <mat-label>Bio</mat-label>
+                  <textarea
+                    matInput
+                    formControlName="bio"
+                    rows="4"
+                    placeholder="Tell others about yourself..."
+                  >
+                  </textarea>
+                  <mat-hint>Maximum 500 characters</mat-hint>
+                  @if (profileForm.get('bio')?.errors?.['maxlength']) {
+                  <mat-error>Bio cannot exceed 500 characters</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Skills Tab -->
+      <mat-tab label="Skills">
+        <div class="py-6">
+          <app-skill-selector
+            [initialSkills]="profile()?.skills || []"
+            (skillsChanged)="onSkillsChanged($event)"
+          />
+        </div>
+      </mat-tab>
+
+      <!-- Availability Tab -->
+      <mat-tab label="Availability">
+        <div class="py-6">
+          <app-availability-editor
+            [initialAvailability]="profile()?.availability || null"
+            (availabilityChanged)="onAvailabilityChanged($event)"
+          />
+        </div>
+      </mat-tab>
+
+      <!-- Contact Information Tab -->
+      <mat-tab label="Contact">
+        <div class="py-6">
+          <mat-card class="mb-6">
+            <mat-card-header>
+              <mat-card-title>Contact Information</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <mat-form-field appearance="outline">
+                  <mat-label>Phone Number</mat-label>
+                  <input
+                    matInput
+                    formControlName="phone"
+                    type="tel"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Alternate Email</mat-label>
+                  <input
+                    matInput
+                    formControlName="alternateEmail"
+                    type="email"
+                    placeholder="alt@example.com"
+                  />
+                </mat-form-field>
+              </div>
+
+              <!-- Address Section -->
+              <div class="mt-6">
+                <h4 class="text-lg font-medium text-gray-900 mb-4">Address</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <mat-form-field appearance="outline" class="md:col-span-2">
+                    <mat-label>Street Address</mat-label>
+                    <input matInput formControlName="street" placeholder="123 Main St" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>City</mat-label>
+                    <input matInput formControlName="city" placeholder="New York" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>State</mat-label>
+                    <input matInput formControlName="state" placeholder="NY" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>ZIP Code</mat-label>
+                    <input matInput formControlName="zipCode" placeholder="10001" />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Country</mat-label>
+                    <input matInput formControlName="country" placeholder="United States" />
+                  </mat-form-field>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Preferences Tab -->
+      <mat-tab label="Preferences">
+        <div class="py-6">
+          <mat-card class="mb-6">
+            <mat-card-header>
+              <mat-card-title>Notification Preferences</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="flex flex-col gap-4">
+                <mat-checkbox formControlName="emailNotifications">
+                  Email Notifications
+                </mat-checkbox>
+                <mat-checkbox formControlName="smsNotifications"> SMS Notifications </mat-checkbox>
+
+                <mat-form-field appearance="outline" class="mt-4">
+                  <mat-label>Max Travel Distance (miles)</mat-label>
+                  <input
+                    matInput
+                    formControlName="maxTravelDistance"
+                    type="number"
+                    min="1"
+                    placeholder="25"
+                  />
+                </mat-form-field>
+              </div>
+
+              <!-- Reminder Preferences -->
+              <div class="mt-6 pt-4 border-t border-gray-200">
+                <h5 class="text-md font-medium text-gray-900 mb-4">Reminder Settings</h5>
+                <div class="flex flex-col gap-3">
+                  <mat-checkbox formControlName="eventReminders"> Event Reminders </mat-checkbox>
+                  <mat-checkbox formControlName="deadlineReminders">
+                    Registration Deadline Reminders
+                  </mat-checkbox>
+                  <mat-checkbox formControlName="weeklyDigest"> Weekly Digest </mat-checkbox>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </form>
+  }
+</div>

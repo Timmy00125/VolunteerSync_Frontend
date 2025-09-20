@@ -154,11 +154,16 @@ export class AuthService {
    * Check backend health (for diagnostics UI)
    */
   checkHealth(): Observable<string> {
+    console.log('[AuthService] Testing health endpoint...');
     return this.apollo
       .query<{ health: { status: string } }>({ query: HEALTH_QUERY, fetchPolicy: 'no-cache' })
       .pipe(
-        map((r) => r.data?.health?.status || 'UNKNOWN'),
+        map((r) => {
+          console.log('[AuthService] Health check successful:', r);
+          return r.data?.health?.status || 'UNKNOWN';
+        }),
         catchError((err) => {
+          console.error('[AuthService] Health check failed:', err);
           return of(this.extractErrorMessage(err));
         })
       );
@@ -353,18 +358,44 @@ export class AuthService {
    * Extract error message from GraphQL error
    */
   private extractErrorMessage(error: any): string {
+    // Enhanced debugging
+    console.error('[AuthService] Full error object:', error);
+
     if (error.graphQLErrors && error.graphQLErrors.length > 0) {
       return error.graphQLErrors[0].message;
     }
     if (error.networkError) {
       // Apollo networkError may contain statusCode, result, or a fetch error
       const ne: any = error.networkError;
+      console.error('[AuthService] Network error details:', {
+        status: ne.status,
+        statusCode: ne.statusCode,
+        message: ne.message,
+        name: ne.name,
+        error: ne.error,
+        result: ne.result,
+      });
+
+      // Check for GraphQL errors in network error result (common with 422 status)
+      if (ne.result && ne.result.errors && ne.result.errors.length > 0) {
+        return ne.result.errors[0].message;
+      }
+
       if (ne.status === 0 || /Failed to fetch|fetch failed|NetworkError/i.test(ne.message || '')) {
         return 'Auth service unreachable. Check server is running.';
       }
       if (ne.status === 404) return 'Auth service endpoint not found (404).';
       if (ne.status === 500) return 'Auth service internal error (500).';
-      return 'Network error communicating with auth service.';
+      if (ne.status === 422) return 'Invalid request data. Please check your input.';
+
+      // Check for CORS errors
+      if (ne.message && /CORS|Cross-Origin|blocked/i.test(ne.message)) {
+        return 'CORS error: Cross-origin request blocked. Check server CORS configuration.';
+      }
+
+      return `Network error communicating with auth service. Status: ${
+        ne.status || 'unknown'
+      }, Message: ${ne.message || 'unknown'}`;
     }
     return error.message || 'An unexpected error occurred.';
   }

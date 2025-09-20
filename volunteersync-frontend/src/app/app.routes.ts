@@ -79,10 +79,22 @@ export const routes: Routes = [
     ],
   },
 
-  // Profile routes (protected) - placeholder redirect until Phase 3
+  // Profile routes (protected)
   {
     path: 'profile',
-    redirectTo: '/dashboard',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./profile/profile-view/profile-view').then((m) => m.ProfileViewComponent),
+      },
+      {
+        path: 'edit',
+        loadComponent: () =>
+          import('./profile/profile-edit/profile-edit').then((m) => m.ProfileEditComponent),
+      },
+    ],
   },
 
   // Settings routes (protected) - placeholder redirect until Phase 3

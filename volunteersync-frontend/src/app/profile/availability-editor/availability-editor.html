@@ -1,0 +1,179 @@
+<div class="max-w-4xl mx-auto p-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-semibold text-gray-900">Availability Settings</h2>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!hasChanges()">
+      Save Changes
+    </button>
+  </div>
+
+  <form [formGroup]="availabilityForm" (ngSubmit)="onSave()">
+    <!-- General Settings -->
+    <mat-card class="mb-6">
+      <mat-card-header>
+        <mat-card-title>General Settings</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Timezone -->
+          <mat-form-field appearance="outline">
+            <mat-label>Time Zone</mat-label>
+            <mat-select formControlName="timeZone" required>
+              @for (timezone of timezones; track timezone.value) {
+              <mat-option [value]="timezone.value">{{ timezone.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Max Hours Per Week -->
+          <mat-form-field appearance="outline">
+            <mat-label>Max Hours Per Week</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="maxHoursPerWeek"
+              min="1"
+              max="168"
+              placeholder="40"
+            />
+            <mat-hint>Leave empty for no limit</mat-hint>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Weekly Schedule -->
+    <mat-card class="mb-6">
+      <mat-card-header>
+        <mat-card-title>Weekly Schedule</mat-card-title>
+        <mat-card-subtitle>Set your availability for each day of the week</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="space-y-4">
+          @for (day of weekDays; track day; let i = $index) {
+          <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
+            <!-- Day Checkbox -->
+            <div class="w-32">
+              <mat-checkbox
+                [formControlName]="'day_' + day + '_available'"
+                (change)="onDayToggle(day, $event.checked)"
+              >
+                <span class="font-medium">{{ formatWeekDay(day) }}</span>
+              </mat-checkbox>
+            </div>
+
+            <!-- Time Inputs -->
+            @if (isDayAvailable(day)) {
+            <div class="flex-1 flex items-center gap-4">
+              <mat-form-field appearance="outline" class="flex-1">
+                <mat-label>Start Time</mat-label>
+                <input matInput type="time" [formControlName]="'day_' + day + '_start'" />
+              </mat-form-field>
+
+              <span class="text-gray-500">to</span>
+
+              <mat-form-field appearance="outline" class="flex-1">
+                <mat-label>End Time</mat-label>
+                <input matInput type="time" [formControlName]="'day_' + day + '_end'" />
+              </mat-form-field>
+
+              <div class="text-sm text-gray-600 w-20">{{ calculateDayHours(day) }} hrs</div>
+            </div>
+            } @else {
+            <div class="flex-1 text-gray-500 italic">Not available</div>
+            }
+          </div>
+          }
+        </div>
+
+        <!-- Total Weekly Hours -->
+        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+          <div class="flex justify-between items-center">
+            <span class="text-sm font-medium text-blue-900">Total Weekly Hours:</span>
+            <span class="text-lg font-semibold text-blue-900">{{ totalWeeklyHours() }} hours</span>
+          </div>
+          @if (availabilityForm.get('maxHoursPerWeek')?.value && totalWeeklyHours() >
+          availabilityForm.get('maxHoursPerWeek')?.value) {
+          <div class="mt-2 text-sm text-red-600">
+            ⚠️ Total hours exceed your maximum limit of
+            {{ availabilityForm.get('maxHoursPerWeek')?.value }} hours
+          </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Unavailable Dates -->
+    <mat-card class="mb-6">
+      <mat-card-header>
+        <mat-card-title>Unavailable Dates</mat-card-title>
+        <mat-card-subtitle>Add specific dates when you're not available</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Select Date</mat-label>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" [min]="minDate" />
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <div class="flex items-end">
+            <button
+              mat-raised-button
+              type="button"
+              (click)="addUnavailableDate()"
+              [disabled]="!selectedDate"
+            >
+              <mat-icon>add</mat-icon>
+              Add Date
+            </button>
+          </div>
+        </div>
+
+        <!-- Unavailable Dates List -->
+        @if (unavailableDates().length > 0) {
+        <div class="space-y-2">
+          <h4 class="font-medium text-gray-900">Unavailable Dates:</h4>
+          <div class="flex flex-wrap gap-2">
+            @for (date of unavailableDates(); track date.getTime()) {
+            <mat-chip-set>
+              <mat-chip (removed)="removeUnavailableDate(date)">
+                {{ formatDate(date) }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip>
+            </mat-chip-set>
+            }
+          </div>
+        </div>
+        } @else {
+        <div class="text-center py-6 text-gray-500">
+          <mat-icon class="text-4xl text-gray-400 mb-2">event_busy</mat-icon>
+          <p>No unavailable dates set</p>
+        </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Quick Actions -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Quick Actions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="flex flex-wrap gap-2">
+          <button mat-stroked-button type="button" (click)="setWeekdaysOnly()">
+            Weekdays Only (9 AM - 5 PM)
+          </button>
+          <button mat-stroked-button type="button" (click)="setWeekendsOnly()">
+            Weekends Only
+          </button>
+          <button mat-stroked-button type="button" (click)="setFullWeek()">
+            Full Week (9 AM - 5 PM)
+          </button>
+          <button mat-stroked-button type="button" (click)="clearAll()">Clear All</button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </form>
+</div>

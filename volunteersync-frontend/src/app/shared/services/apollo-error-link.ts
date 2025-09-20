@@ -56,6 +56,14 @@ export class ApolloErrorLinkService {
       // Handle network errors
       if (networkError) {
         console.error(`[Network error]: ${networkError}`);
+        console.error('[Network error details]:', {
+          name: networkError.name,
+          message: networkError.message,
+          stack: networkError.stack,
+          statusCode: 'statusCode' in networkError ? networkError.statusCode : 'N/A',
+          status: 'status' in networkError ? networkError.status : 'N/A',
+          result: 'result' in networkError ? networkError.result : 'N/A',
+        });
 
         // Handle network authentication errors
         if ('statusCode' in networkError && networkError.statusCode === 401) {

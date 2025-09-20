@@ -1,0 +1,161 @@
+<div class="max-w-7xl mx-auto p-5">
+  @if (isLoading()) {
+  <div class="flex flex-col items-center justify-center p-10 text-center">
+    <mat-spinner class="mb-4"></mat-spinner>
+    <p class="text-gray-600">Loading profile...</p>
+  </div>
+  } @else if (error()) {
+  <div class="flex flex-col items-center justify-center p-10 text-center">
+    <mat-icon color="warn" class="text-5xl w-12 h-12 mb-4">error</mat-icon>
+    <p class="text-red-600 mb-4">{{ error() }}</p>
+    <button mat-raised-button color="primary" (click)="loadProfile()">Retry</button>
+  </div>
+  } @else if (profile()) {
+  <!-- Profile Header -->
+  <mat-card class="mb-6">
+    <mat-card-header>
+      <div class="flex justify-between items-start w-full">
+        <div class="flex flex-col">
+          <h1 class="text-4xl font-medium mb-2 m-0">{{ displayName() }}</h1>
+          <p class="text-gray-600 text-lg mb-4 m-0">{{ userEmail() }}</p>
+          @if (profile()?.bio) {
+          <p class="text-base leading-relaxed max-w-2xl m-0">{{ profile()?.bio }}</p>
+          }
+        </div>
+        @if (isOwnProfile()) {
+        <div class="flex items-center gap-2">
+          <button mat-raised-button color="primary" [routerLink]="['/profile/edit']">
+            <mat-icon>edit</mat-icon>
+            Edit Profile
+          </button>
+        </div>
+        }
+      </div>
+    </mat-card-header>
+  </mat-card>
+
+  <!-- Skills Section -->
+  @if (profile()?.skills?.length) {
+  <mat-card class="mb-6">
+    <mat-card-header>
+      <mat-card-title>Skills</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="flex flex-wrap gap-2">
+        @for (skill of profile()?.skills || []; track skill.id) {
+        <mat-chip-set>
+          <mat-chip [class]="'skill-' + skill.level.toLowerCase()">
+            {{ skill.name }}
+            @if (skill.verified) {
+            <mat-icon matChipTrailingIcon>verified</mat-icon>
+            }
+          </mat-chip>
+        </mat-chip-set>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+  }
+
+  <!-- Availability Section -->
+  @if (profile()?.availability) {
+  <mat-card class="mb-6">
+    <mat-card-header>
+      <mat-card-title>Availability</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @if (profile()?.availability?.timeZone) {
+        <div class="flex items-center gap-3">
+          <mat-icon class="text-gray-600">schedule</mat-icon>
+          <div>
+            <h4 class="font-medium text-sm text-gray-900 mb-1">Time Zone</h4>
+            <p class="text-gray-700 m-0">{{ profile()!.availability!.timeZone }}</p>
+          </div>
+        </div>
+        } @if (profile()?.availability?.maxHoursPerWeek) {
+        <div class="flex items-center gap-3">
+          <mat-icon class="text-gray-600">access_time</mat-icon>
+          <div>
+            <h4 class="font-medium text-sm text-gray-900 mb-1">Max Hours per Week</h4>
+            <p class="text-gray-700 m-0">{{ profile()!.availability!.maxHoursPerWeek }} hours</p>
+          </div>
+        </div>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+  }
+
+  <!-- Contact Information (only for own profile or authorized users) -->
+  @if (isOwnProfile() && profile()?.contactInfo) {
+  <mat-card class="mb-6">
+    <mat-card-header>
+      <mat-card-title>Contact Information</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @if (profile()?.contactInfo?.phone) {
+        <div class="flex items-center gap-3">
+          <mat-icon class="text-gray-600">phone</mat-icon>
+          <div>
+            <h4 class="font-medium text-sm text-gray-900 mb-1">Phone</h4>
+            <p class="text-gray-700 m-0">{{ profile()!.contactInfo!.phone }}</p>
+          </div>
+        </div>
+        } @if (profile()?.contactInfo?.alternateEmail) {
+        <div class="flex items-center gap-3">
+          <mat-icon class="text-gray-600">alternate_email</mat-icon>
+          <div>
+            <h4 class="font-medium text-sm text-gray-900 mb-1">Alternate Email</h4>
+            <p class="text-gray-700 m-0">{{ profile()!.contactInfo!.alternateEmail }}</p>
+          </div>
+        </div>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+  }
+
+  <!-- Preferences Section -->
+  @if (profile()?.preferences) {
+  <mat-card class="mb-6">
+    <mat-card-header>
+      <mat-card-title>Preferences</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        @if (profile()?.preferences?.eventTypes?.length) {
+        <div class="flex items-start gap-3">
+          <mat-icon class="text-gray-600 mt-1">event</mat-icon>
+          <div>
+            <h4 class="font-medium text-sm text-gray-900 mb-2">Preferred Event Types</h4>
+            <div class="flex flex-wrap gap-1">
+              @for (eventType of profile()!.preferences!.eventTypes! || []; track eventType) {
+              <mat-chip class="text-xs">{{ eventType }}</mat-chip>
+              }
+            </div>
+          </div>
+        </div>
+        } @if (profile()?.preferences?.maxTravelDistance) {
+        <div class="flex items-center gap-3">
+          <mat-icon class="text-gray-600">directions_car</mat-icon>
+          <div>
+            <h4 class="font-medium text-sm text-gray-900 mb-1">Max Travel Distance</h4>
+            <p class="text-gray-700 m-0">{{ profile()!.preferences!.maxTravelDistance }} miles</p>
+          </div>
+        </div>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+  } } @else {
+  <div class="flex flex-col items-center justify-center p-10 text-center">
+    <mat-icon class="text-6xl text-gray-400 mb-4">person</mat-icon>
+    <h2 class="text-2xl font-medium text-gray-600 mb-4">Profile not found</h2>
+    <button mat-raised-button color="primary" [routerLink]="['/dashboard']">
+      Back to Dashboard
+    </button>
+  </div>
+  }
+</div>

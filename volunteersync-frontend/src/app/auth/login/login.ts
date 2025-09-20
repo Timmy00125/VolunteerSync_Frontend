@@ -40,6 +40,7 @@ export class LoginComponent implements OnInit {
   // Component state signals
   isSubmitting = signal(false);
   showPassword = signal(false);
+  healthStatus = signal<string>('');
   notification = signal<{ type: NotificationType; message: string; title?: string } | null>(null);
 
   ngOnInit(): void {
@@ -101,6 +102,15 @@ export class LoginComponent implements OnInit {
     this.router.navigate(['/auth/register']);
   }
 
+
+
+  /**
+   * Dismiss notification
+   */
+  onDismissNotification(): void {
+    this.notification.set(null);
+  }
+
   /**
    * Get field error message
    */
@@ -126,12 +136,5 @@ export class LoginComponent implements OnInit {
   shouldShowFieldError(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return field ? this.validationService.shouldShowError(field) : false;
-  }
-
-  /**
-   * Dismiss notification
-   */
-  onDismissNotification(): void {
-    this.notification.set(null);
   }
 }

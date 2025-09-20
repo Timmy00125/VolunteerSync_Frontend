@@ -1,0 +1,277 @@
+/* Custom styles for Material components that can't be styled with Tailwind utility classes */
+
+.skill-beginner {
+  background-color: #e8f5e8 !important;
+  color: #2e7d32 !important;
+}
+
+.skill-intermediate {
+  background-color: #fff3e0 !important;
+  color: #f57c00 !important;
+}
+
+.skill-advanced {
+  background-color: #e3f2fd !important;
+  color: #1976d2 !important;
+}
+
+.skill-expert {
+  background-color: #fce4ec !important;
+  color: #c2185b !important;
+}
+
+.bio {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 600px;
+}
+
+.actions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-tabs {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-content {
+  padding: 24px;
+  min-height: 400px;
+}
+
+/* Skills */
+.skill-category {
+  margin-bottom: 32px;
+}
+
+.skill-category h3 {
+  margin: 0 0 16px 0;
+  color: #1976d2;
+  font-size: 1.3rem;
+}
+
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skills-list mat-chip {
+  margin: 0;
+}
+
+.skill-beginner {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+}
+
+.skill-intermediate {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.skill-advanced {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.skill-expert {
+  background-color: #fce4ec;
+  color: #c2185b;
+}
+
+/* Availability */
+.availability-info {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.timezone-info,
+.hours-info {
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.timezone-info h4,
+.hours-info h4 {
+  margin: 0 0 8px 0;
+  color: #666;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.timezone-info p,
+.hours-info p {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.weekly-schedule h4 {
+  margin: 0 0 16px 0;
+  font-size: 1.2rem;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.day-availability {
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  border: 2px solid transparent;
+}
+
+.day-availability.available {
+  background-color: #e8f5e8;
+  border-color: #4caf50;
+}
+
+.day-availability.unavailable {
+  background-color: #ffebee;
+  border-color: #f44336;
+  opacity: 0.6;
+}
+
+.day-availability h5 {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.day-availability p {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.unavailable-dates h4 {
+  margin: 0 0 16px 0;
+  font-size: 1.2rem;
+}
+
+.dates-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Contact */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.contact-item mat-icon {
+  color: #666;
+  margin-top: 2px;
+}
+
+.address p {
+  margin: 0 0 4px 0;
+}
+
+.address p:last-child {
+  margin: 0;
+}
+
+/* Preferences */
+.preferences-info {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.preference-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.event-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.notification-prefs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pref-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+}
+
+.pref-item mat-icon {
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+}
+
+/* Empty States */
+.empty-state {
+  padding: 60px 20px;
+}
+
+.empty-state mat-icon {
+  font-size: 64px;
+  height: 64px;
+  width: 64px;
+  color: #ccc;
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0 0 20px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 16px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .user-info h1 {
+    font-size: 2rem;
+  }
+
+  .weekdays {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .tab-content {
+    padding: 16px;
+  }
+}

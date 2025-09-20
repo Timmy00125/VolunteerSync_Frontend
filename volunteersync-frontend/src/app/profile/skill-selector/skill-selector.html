@@ -1,0 +1,130 @@
+<div class="max-w-4xl mx-auto p-6">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-semibold text-gray-900">Manage Skills</h2>
+    <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!hasChanges()">
+      Save Changes
+    </button>
+  </div>
+
+  <!-- Add New Skill Section -->
+  <mat-card class="mb-6">
+    <mat-card-header>
+      <mat-card-title>Add New Skill</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Skill Category Filter -->
+        <mat-form-field appearance="outline">
+          <mat-label>Category</mat-label>
+          <mat-select [formControl]="categoryControl">
+            <mat-option value="">All Categories</mat-option>
+            @for (category of skillCategories; track category) {
+            <mat-option [value]="category">{{ formatCategory(category) }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Skill Search -->
+        <mat-form-field appearance="outline">
+          <mat-label>Search Skills</mat-label>
+          <input
+            matInput
+            [formControl]="searchControl"
+            [matAutocomplete]="auto"
+            placeholder="Type to search..."
+          />
+          <mat-autocomplete
+            #auto="matAutocomplete"
+            (optionSelected)="onSkillSelected($event.option.value)"
+          >
+            @for (skill of filteredAvailableSkills(); track skill.name) {
+            <mat-option [value]="skill">{{ skill.name }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <!-- Skill Level -->
+        <mat-form-field appearance="outline">
+          <mat-label>Proficiency Level</mat-label>
+          <mat-select [formControl]="levelControl">
+            @for (level of skillLevels; track level) {
+            <mat-option [value]="level">{{ formatLevel(level) }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="flex justify-end mt-4">
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="addCustomSkill()"
+          [disabled]="!canAddSkill()"
+        >
+          <mat-icon>add</mat-icon>
+          Add Skill
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Current Skills -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Your Skills</mat-card-title>
+      <mat-card-subtitle>{{ currentSkills().length }} skills total</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @if (currentSkills().length === 0) {
+      <div class="flex flex-col items-center justify-center py-12 text-center">
+        <mat-icon class="text-6xl text-gray-400 mb-4">lightbulb_outline</mat-icon>
+        <h3 class="text-lg font-medium text-gray-600 mb-2">No skills added yet</h3>
+        <p class="text-gray-500">Add your first skill using the form above</p>
+      </div>
+      } @else {
+      <!-- Skills by Category -->
+      @for (category of usedCategories(); track category) {
+      <div class="mb-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-3 flex items-center gap-2">
+          <mat-icon class="text-blue-600">{{ getCategoryIcon(category) }}</mat-icon>
+          {{ formatCategory(category) }}
+        </h3>
+        <div class="flex flex-wrap gap-2">
+          @for (skill of getSkillsByCategory(category); track skill.id || skill.name) {
+          <div class="flex items-center bg-gray-50 rounded-lg p-2 border border-gray-200">
+            <mat-chip [class]="'skill-' + skill.level.toLowerCase() + ' mr-2'">
+              {{ skill.name }}
+              @if (skill.verified) {
+              <mat-icon matChipTrailingIcon class="text-green-600">verified</mat-icon>
+              }
+            </mat-chip>
+
+            <!-- Level Selector -->
+            <mat-form-field appearance="outline" class="w-32 mr-2">
+              <mat-select [value]="skill.level" (valueChange)="updateSkillLevel(skill, $event)">
+                @for (level of skillLevels; track level) {
+                <mat-option [value]="level">{{ formatLevel(level) }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <!-- Remove Button -->
+            <button mat-icon-button color="warn" (click)="removeSkill(skill)" class="ml-2">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+          }
+        </div>
+      </div>
+      } }
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="flex justify-center items-center py-8">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+  }
+</div>

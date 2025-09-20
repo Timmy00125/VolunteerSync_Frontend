@@ -68,6 +68,24 @@ export interface RegistrationStats {
   cancellationRate: number;
 }
 
+export interface RegistrationSummary {
+  totalRegistrations: number;
+  activeRegistrations: number;
+  cancelledRegistrations: number;
+  attendedEvents: number;
+  upcomingEvents: number;
+}
+
+export interface RegistrationFilter {
+  userId?: string;
+  eventId?: string;
+  status?: RegistrationStatus;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+}
+
 // Input types for registration mutations
 export interface RegisterForEventInput {
   eventId: string;
