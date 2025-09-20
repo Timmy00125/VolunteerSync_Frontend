@@ -170,24 +170,30 @@ export class AuthService {
   logout(): Observable<boolean> {
     this.setLoading(true);
 
+    // Clear local state immediately for better UX
+    this.clearAuthState();
+
     return this.apollo
       .mutate({
         mutation: LOGOUT_MUTATION,
       })
       .pipe(
         tap(() => {
-          this.clearAuthState();
-          this.router.navigate(['/auth/login']);
+          // Server logout succeeded
+          console.debug('Server logout completed successfully');
         }),
         map(() => true),
         catchError((error) => {
-          console.error('Logout error:', error);
-          // Clear local state even if server logout fails
-          this.clearAuthState();
-          this.router.navigate(['/auth/login']);
+          // Server logout failed, but local state is already cleared
+          console.warn('Server logout failed, but local state cleared:', error);
+          // Don't show error to user for logout failures - local state is already cleared
           return of(true);
         }),
-        tap(() => this.setLoading(false))
+        tap(() => {
+          this.setLoading(false);
+          // Always navigate to login after logout attempt
+          this.router.navigate(['/auth/login']);
+        })
       );
   }
 

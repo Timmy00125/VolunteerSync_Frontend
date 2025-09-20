@@ -100,16 +100,13 @@ export class HeaderComponent {
    * Handle logout
    */
   logout(): void {
+    this.closeMenus();
     this.authService.logout().subscribe({
       next: () => {
-        this.closeMenus();
-        this.router.navigate(['/auth/login']);
+        // Auth service handles navigation
       },
-      error: (error) => {
-        console.error('Logout error:', error);
-        // Still navigate to login even if logout fails
-        this.closeMenus();
-        this.router.navigate(['/auth/login']);
+      error: () => {
+        // Auth service handles errors gracefully
       },
     });
   }

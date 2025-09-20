@@ -17,6 +17,10 @@ export class ApolloErrorLinkService {
    */
   createErrorLink() {
     return onError(({ graphQLErrors, networkError, operation, forward }) => {
+      // Skip error handling for logout operations since auth service handles them gracefully
+      const operationName = operation.operationName;
+      const isLogoutOperation = operationName === 'Logout';
+
       // Handle GraphQL errors
       if (graphQLErrors) {
         graphQLErrors.forEach(({ message, locations, path, extensions }) => {
@@ -43,8 +47,10 @@ export class ApolloErrorLinkService {
           );
         });
 
-        // Use error handler for user notifications
-        this.errorHandler.handleGraphQLError(new ApolloError({ graphQLErrors, networkError }));
+        // Don't show error notifications for logout operations
+        if (!isLogoutOperation) {
+          this.errorHandler.handleGraphQLError(new ApolloError({ graphQLErrors, networkError }));
+        }
       }
 
       // Handle network errors
@@ -56,15 +62,17 @@ export class ApolloErrorLinkService {
           this.handleUnauthenticated();
         }
 
-        // Handle other network errors
-        this.errorHandler.handleHttpError(
-          new HttpErrorResponse({
-            error: networkError,
-            status: ('statusCode' in networkError && networkError.statusCode) || 0,
-            statusText: networkError.message,
-          }),
-          `GraphQL Operation: ${operation.operationName}`
-        );
+        // Don't show error notifications for logout operations
+        if (!isLogoutOperation) {
+          this.errorHandler.handleHttpError(
+            new HttpErrorResponse({
+              error: networkError,
+              status: ('statusCode' in networkError && networkError.statusCode) || 0,
+              statusText: networkError.message,
+            }),
+            `GraphQL Operation: ${operation.operationName}`
+          );
+        }
       }
     });
   }
