@@ -1,0 +1,362 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Registration Manager</h1>
+      <p class="text-gray-600">Manage volunteer registrations for your events</p>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading()) {
+    <div class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <span class="ml-3 text-gray-600">Loading registrations...</span>
+    </div>
+    }
+
+    <!-- Error State -->
+    @if (error()) {
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clip-rule="evenodd"
+            ></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">Error</h3>
+          <p class="mt-1 text-sm text-red-700">{{ error() }}</p>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Content -->
+    @if (!loading() && !error()) {
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow px-6 py-4">
+        <dt class="text-sm font-medium text-gray-500 truncate">Total Registrations</dt>
+        <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ registrationStats().total }}</dd>
+      </div>
+      <div class="bg-white rounded-lg shadow px-6 py-4">
+        <dt class="text-sm font-medium text-gray-500 truncate">Confirmed</dt>
+        <dd class="mt-1 text-3xl font-semibold text-green-600">
+          {{ registrationStats().confirmed }}
+        </dd>
+      </div>
+      <div class="bg-white rounded-lg shadow px-6 py-4">
+        <dt class="text-sm font-medium text-gray-500 truncate">Pending</dt>
+        <dd class="mt-1 text-3xl font-semibold text-yellow-600">
+          {{ registrationStats().pending }}
+        </dd>
+      </div>
+      <div class="bg-white rounded-lg shadow px-6 py-4">
+        <dt class="text-sm font-medium text-gray-500 truncate">Waitlisted</dt>
+        <dd class="mt-1 text-3xl font-semibold text-purple-600">
+          {{ registrationStats().waitlisted }}
+        </dd>
+      </div>
+      <div class="bg-white rounded-lg shadow px-6 py-4">
+        <dt class="text-sm font-medium text-gray-500 truncate">Completed</dt>
+        <dd class="mt-1 text-3xl font-semibold text-blue-600">
+          {{ registrationStats().completed }}
+        </dd>
+      </div>
+      <div class="bg-white rounded-lg shadow px-6 py-4">
+        <dt class="text-sm font-medium text-gray-500 truncate">Cancelled</dt>
+        <dd class="mt-1 text-3xl font-semibold text-red-600">
+          {{ registrationStats().cancelled }}
+        </dd>
+      </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="bg-white rounded-lg shadow mb-6">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-medium text-gray-900">Filters</h2>
+      </div>
+      <div class="p-6">
+        <form [formGroup]="filterForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Search -->
+          <div>
+            <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+            <input
+              type="text"
+              id="search"
+              formControlName="search"
+              placeholder="Search by name, email, or event..."
+              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          </div>
+
+          <!-- Event Filter -->
+          <div>
+            <label for="eventId" class="block text-sm font-medium text-gray-700 mb-2">Event</label>
+            <select
+              id="eventId"
+              formControlName="eventId"
+              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            >
+              <option [value]="null">All Events</option>
+              @for (event of events(); track event.id) {
+              <option [value]="event.id">{{ event.title }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div>
+            <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select
+              id="status"
+              formControlName="status"
+              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            >
+              @for (option of statusOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Bulk Actions -->
+    @if (selectedRegistrations().length > 0) {
+    <div class="bg-indigo-50 rounded-lg p-4 mb-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <span class="text-sm font-medium text-indigo-900">
+            {{ selectedRegistrations().length }} registration(s) selected
+          </span>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button
+            type="button"
+            (click)="onBulkUpdateStatus(statusOptions[1].value!)"
+            [disabled]="bulkUpdateLoading()"
+            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+          >
+            Confirm
+          </button>
+          <button
+            type="button"
+            (click)="onBulkUpdateStatus(statusOptions[2].value!)"
+            [disabled]="bulkUpdateLoading()"
+            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50"
+          >
+            Set Pending
+          </button>
+          <button
+            type="button"
+            (click)="onBulkUpdateStatus(statusOptions[3].value!)"
+            [disabled]="bulkUpdateLoading()"
+            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+          >
+            Waitlist
+          </button>
+          <button
+            type="button"
+            (click)="onBulkUpdateStatus(statusOptions[4].value!)"
+            [disabled]="bulkUpdateLoading()"
+            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Export Button -->
+    <div class="flex justify-end mb-6">
+      <button
+        type="button"
+        (click)="onExportRegistrations()"
+        class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        <svg
+          class="-ml-1 mr-2 h-5 w-5 text-gray-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          ></path>
+        </svg>
+        Export to CSV
+      </button>
+    </div>
+
+    <!-- Registrations Table -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">
+            Registrations ({{ filteredRegistrations().length }})
+          </h3>
+        </div>
+      </div>
+
+      @if (filteredRegistrations().length === 0) {
+      <!-- Empty State -->
+      <div class="text-center py-12">
+        <svg
+          class="mx-auto h-12 w-12 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+          ></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No registrations found</h3>
+        <p class="mt-1 text-sm text-gray-500">
+          @if (searchTerm() || statusFilter() || selectedEvent()) { No registrations match your
+          current filters. } @else { No registrations found for your events. }
+        </p>
+      </div>
+      } @else {
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                <input
+                  type="checkbox"
+                  [checked]="allSelected()"
+                  [indeterminate]="someSelected()"
+                  (change)="onSelectAllRegistrations()"
+                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                />
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Volunteer
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Event
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Status
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Applied
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Contact
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Notes
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            @for (registration of filteredRegistrations(); track registration.id) {
+            <tr
+              class="hover:bg-gray-50"
+              [class.bg-indigo-50]="isRegistrationSelected(registration)"
+            >
+              <td class="px-6 py-4 whitespace-nowrap">
+                <input
+                  type="checkbox"
+                  [checked]="isRegistrationSelected(registration)"
+                  (change)="onToggleRegistrationSelection(registration)"
+                  class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                />
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <div
+                      class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center"
+                    >
+                      <span class="text-sm font-medium text-indigo-700">
+                        {{ registration.user.firstName?.charAt(0) || ''
+                        }}{{ registration.user.lastName?.charAt(0) || '' }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ registration.user.firstName }} {{ registration.user.lastName }}
+                    </div>
+                    <div class="text-sm text-gray-500">
+                      {{ registration.user.email }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{{ registration.event.title }}</div>
+                <div class="text-sm text-gray-500">
+                  {{ formatDate(registration.event.startTime) }}
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                  [class]="getStatusDisplay(registration.status).color"
+                >
+                  {{ getStatusDisplay(registration.status).label }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ formatDate(registration.appliedAt) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                @if (registration.user.profile?.emergencyContact) {
+                <div>
+                  Emergency: {{ registration.user.profile?.emergencyContact?.name }} -
+                  {{ registration.user.profile?.emergencyContact?.phone }}
+                </div>
+                } @if (registration.user.profile?.contactInfo?.phone) {
+                <div>Phone: {{ registration.user.profile?.contactInfo?.phone }}</div>
+                }
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-sm text-gray-900 max-w-xs truncate">
+                  @if (registration.personalMessage) {
+                  {{ registration.personalMessage }}
+                  } @else {
+                  <span class="text-gray-500 italic">No message</span>
+                  }
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+    </div>
+    }
+  </div>
+</div>

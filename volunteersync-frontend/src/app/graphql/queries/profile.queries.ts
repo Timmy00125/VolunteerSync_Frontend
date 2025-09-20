@@ -1,22 +1,70 @@
 import { gql } from 'apollo-angular';
 import { PROFILE_FRAGMENT, SKILL_FRAGMENT } from '../fragments/user.fragments';
 
-// Get user profile
+// Get user profile (public profile for specific user)
 export const GET_PROFILE = gql`
-  ${PROFILE_FRAGMENT}
-  query GetProfile($userId: ID) {
-    profile(userId: $userId) {
-      ...ProfileFragment
+  query GetProfile($id: ID!) {
+    user(id: $id) {
+      id
+      name
+      email
+      bio
+      profilePicture
+      isVerified
+      joinedAt
+      lastActiveAt
+      location {
+        city
+        state
+        country
+      }
+      interests {
+        id
+        name
+        category
+      }
+      skills {
+        id
+        name
+        category
+        level
+        verified
+      }
     }
   }
 `;
 
-// Get my profile (current user)
+// Get my profile (current user with full details)
 export const GET_MY_PROFILE = gql`
-  ${PROFILE_FRAGMENT}
   query GetMyProfile {
-    myProfile {
-      ...ProfileFragment
+    me {
+      id
+      email
+      name
+      emailVerified
+      bio
+      profilePicture
+      isVerified
+      joinedAt
+      lastActiveAt
+      location {
+        city
+        state
+        country
+      }
+      interests {
+        id
+        name
+        category
+      }
+      skills {
+        id
+        name
+        category
+        level
+        verified
+      }
+      roles
     }
   }
 `;

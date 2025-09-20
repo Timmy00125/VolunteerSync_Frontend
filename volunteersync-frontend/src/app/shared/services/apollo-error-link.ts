@@ -30,9 +30,14 @@ export class ApolloErrorLinkService {
 
           const errorCode = extensions?.['code'] as string;
 
-          // Handle authentication errors
-          if (errorCode === 'UNAUTHENTICATED' || errorCode === 'TOKEN_EXPIRED') {
+          // Handle authentication errors - check both error code and message
+          if (
+            errorCode === 'UNAUTHENTICATED' ||
+            errorCode === 'TOKEN_EXPIRED' ||
+            message === 'unauthorized'
+          ) {
             this.handleUnauthenticated();
+            return; // Don't show additional error notifications for auth errors
           }
 
           // Handle authorization errors

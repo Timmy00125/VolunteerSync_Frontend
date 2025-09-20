@@ -1,18 +1,24 @@
-import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, switchMap } from 'rxjs';
 
 // Services
 import { EventService } from '../services/event';
 import { EventUiService } from '../services/event-ui';
 import { AuthService } from '../../auth/services/auth';
+import { RegistrationService } from '../../registration/services/registration';
+import { RegistrationUiService } from '../../registration/services/registration-ui';
 
 // Models
 import { Event } from '../../shared/models/event.model';
 import { User } from '../../shared/models/user.model';
-import { RegisterForEventInput } from '../../shared/models/registration.model';
+import {
+  RegisterForEventInput,
+  Registration,
+  RegistrationStatus,
+} from '../../shared/models/registration.model';
 
 // Components
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner';
@@ -34,22 +40,32 @@ import {
   styleUrl: './event-registration.css',
 })
 export class EventRegistrationComponent implements OnInit, OnDestroy {
+  // Input properties
+  @Input() event!: Event;
+  @Input() showAsButton = true;
+  @Input() showCapacity = true;
+
   private eventService = inject(EventService);
   public eventUiService = inject(EventUiService);
   private authService = inject(AuthService);
+  private registrationService = inject(RegistrationService);
+  private registrationUiService = inject(RegistrationUiService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private destroy$ = new Subject<void>();
 
   // State signals
-  event = signal<Event | null>(null);
+  eventSignal = signal<Event | null>(null);
   currentUser = signal<User | null>(null);
+  userRegistration = signal<Registration | null>(null);
   loading = signal(true);
   submitting = signal(false);
+  registering = signal(false);
 
   // Dialog state
   showConfirmDialog = signal(false);
+  showCancellationDialog = signal(false);
   confirmDialogData = signal<ConfirmDialogData>({
     title: '',
     message: '',
@@ -61,9 +77,37 @@ export class EventRegistrationComponent implements OnInit, OnDestroy {
 
   // Computed values
   canRegister = computed(() => {
-    const event = this.event();
+    const event = this.event || this.eventSignal();
     const user = this.currentUser();
-    return event && user ? this.eventUiService.canUserRegister(event, user) : false;
+    const registration = this.userRegistration();
+
+    return this.registrationUiService.canUserRegisterForEvent(event, user, registration);
+  });
+
+  isRegistered = computed(() => {
+    const registration = this.userRegistration();
+    return (
+      registration &&
+      (registration.status === RegistrationStatus.CONFIRMED ||
+        registration.status === RegistrationStatus.PENDING_APPROVAL)
+    );
+  });
+
+  registrationStatus = computed(() => {
+    return this.userRegistration()?.status || null;
+  });
+
+  canCancelRegistration = computed(() => {
+    const registration = this.userRegistration();
+    const event = this.event || this.eventSignal();
+
+    if (!registration || !event) return false;
+
+    return (
+      registration.canCancel &&
+      registration.status === RegistrationStatus.CONFIRMED &&
+      new Date(event.startTime) > new Date()
+    );
   });
 
   constructor() {
@@ -73,11 +117,19 @@ export class EventRegistrationComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.currentUser.set(this.authService.currentUser());
 
-    const eventId = this.route.snapshot.paramMap.get('id');
-    if (eventId) {
-      this.loadEvent(eventId);
+    // If event is provided as input, use it
+    if (this.event) {
+      this.eventSignal.set(this.event);
+      this.loadUserRegistration();
+      this.loading.set(false);
     } else {
-      this.router.navigate(['/events']);
+      // Otherwise load from route parameters
+      const eventId = this.route.snapshot.paramMap.get('id');
+      if (eventId) {
+        this.loadEvent(eventId);
+      } else {
+        this.router.navigate(['/events']);
+      }
     }
   }
 
@@ -108,7 +160,8 @@ export class EventRegistrationComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (event) => {
-          this.event.set(event);
+          this.eventSignal.set(event);
+          this.loadUserRegistration();
           this.loading.set(false);
 
           // Check if user can register
@@ -125,8 +178,18 @@ export class EventRegistrationComponent implements OnInit, OnDestroy {
       });
   }
 
+  private loadUserRegistration(): void {
+    const event = this.event || this.eventSignal();
+
+    if (event) {
+      const registration = this.registrationService.getUserRegistrationForEvent(event);
+      this.userRegistration.set(registration);
+    }
+  }
+
   onSubmit(): void {
-    if (this.registrationForm.valid && this.event()) {
+    const event = this.event || this.eventSignal();
+    if (this.registrationForm.valid && event) {
       this.showRegistrationConfirmation();
     } else {
       this.markFormGroupTouched(this.registrationForm);
@@ -135,7 +198,9 @@ export class EventRegistrationComponent implements OnInit, OnDestroy {
   }
 
   private showRegistrationConfirmation(): void {
-    const event = this.event()!;
+    const event = this.event || this.eventSignal();
+    if (!event) return;
+
     this.confirmDialogData.set({
       title: 'Confirm Registration',
       message: `Are you sure you want to register for "${event.title}"? ${
@@ -160,7 +225,9 @@ export class EventRegistrationComponent implements OnInit, OnDestroy {
   }
 
   private submitRegistration(): void {
-    const event = this.event()!;
+    const event = this.event || this.eventSignal();
+    if (!event) return;
+
     const formValue = this.registrationForm.value;
 
     const registrationData: RegisterForEventInput = {
@@ -176,17 +243,20 @@ export class EventRegistrationComponent implements OnInit, OnDestroy {
 
     this.submitting.set(true);
 
-    this.eventService
-      .registerForEvent(registrationData)
+    this.registrationService
+      .registerForEvent(event.id, registrationData)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (registration) => {
+          this.userRegistration.set(registration);
           this.eventUiService.setSuccess(
             event.registrationSettings.requiresApproval
               ? 'Registration submitted successfully! You will be notified when it is reviewed.'
               : 'Registration successful! Check your email for confirmation details.'
           );
+          // Navigate back to event details
           this.router.navigate(['/events', event.id]);
+          this.submitting.set(false);
         },
         error: (error) => {
           console.error('Error registering for event:', error);
@@ -197,7 +267,57 @@ export class EventRegistrationComponent implements OnInit, OnDestroy {
   }
 
   onCancel(): void {
-    this.router.navigate(['/events', this.event()?.id || '']);
+    const event = this.event || this.eventSignal();
+    this.router.navigate(['/events', event?.id || '']);
+  }
+
+  // Cancellation methods
+  private showCancellationConfirmation(): void {
+    const registration = this.userRegistration();
+    const event = this.event || this.eventSignal();
+
+    if (!registration || !event) return;
+
+    this.confirmDialogData.set({
+      title: 'Cancel Registration',
+      message: `Are you sure you want to cancel your registration for "${event.title}"? This action cannot be undone.`,
+      confirmText: 'Cancel Registration',
+      cancelText: 'Keep Registration',
+      type: 'warning',
+    });
+    this.showCancellationDialog.set(true);
+  }
+
+  onConfirmCancellation(): void {
+    this.showCancellationDialog.set(false);
+    this.submitCancellation();
+  }
+
+  onCancelCancellation(): void {
+    this.showCancellationDialog.set(false);
+  }
+
+  private submitCancellation(): void {
+    const registration = this.userRegistration();
+    if (!registration) return;
+
+    this.submitting.set(true);
+
+    this.registrationService
+      .cancelRegistration(registration.id, 'User requested cancellation')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.userRegistration.set(null);
+          this.eventUiService.setSuccess('Registration cancelled successfully.');
+          this.submitting.set(false);
+        },
+        error: (error) => {
+          console.error('Error cancelling registration:', error);
+          this.eventUiService.setError('Failed to cancel registration. Please try again.');
+          this.submitting.set(false);
+        },
+      });
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

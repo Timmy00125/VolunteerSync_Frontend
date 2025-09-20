@@ -1,0 +1,554 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="flex items-center justify-center min-h-64">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p class="text-gray-600">Loading your dashboard...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error() && !loading()" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+      <div class="flex">
+        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fill-rule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">Error Loading Dashboard</h3>
+          <p class="mt-2 text-sm text-red-700">{{ error() }}</p>
+          <button
+            (click)="onRefreshDashboard()"
+            class="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading() && !error()" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">
+        Welcome back{{ currentUser()?.firstName ? ', ' + currentUser()?.firstName : '' }}!
+      </h1>
+      <p class="mt-2 text-gray-600">
+        Here's your volunteer activity overview and upcoming opportunities.
+      </p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Upcoming Events -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-8 w-8 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Upcoming Events</dt>
+              <dd class="text-lg font-medium text-gray-900">{{ upcomingEventsCount() }}</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Hours -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-8 w-8 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Hours Volunteered</dt>
+              <dd class="text-lg font-medium text-gray-900">{{ totalVolunteerHours() }}</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <!-- Events Attended -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-8 w-8 text-purple-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+              />
+            </svg>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Events Completed</dt>
+              <dd class="text-lg font-medium text-gray-900">
+                {{ registrationSummary()?.attendedEvents || 0 }}
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Completion -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-8 w-8 text-orange-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Profile Complete</dt>
+              <dd class="text-lg font-medium text-gray-900">
+                {{ profileCompletionPercentage() }}%
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Upcoming Events -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-medium text-gray-900">Upcoming Events</h2>
+            <button
+              (click)="onBrowseEvents()"
+              class="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Browse all events
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <div *ngIf="upcomingEvents().length === 0" class="text-center py-8">
+            <svg
+              class="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No upcoming events</h3>
+            <p class="mt-1 text-sm text-gray-500">
+              You haven't registered for any upcoming volunteer opportunities.
+            </p>
+            <div class="mt-6">
+              <button
+                (click)="onBrowseEvents()"
+                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              >
+                <svg
+                  class="-ml-1 mr-2 h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                Find opportunities
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="upcomingEvents().length > 0" class="space-y-4">
+            <div
+              *ngFor="let registration of upcomingEvents()"
+              class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+            >
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <h3 class="text-sm font-medium text-gray-900">{{ registration.event.title }}</h3>
+                  <p class="mt-1 text-sm text-gray-600">
+                    {{ formatDate(registration.event.startTime) }}
+                  </p>
+                  <div class="mt-2 flex items-center space-x-4">
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [ngClass]="getRegistrationStatusDisplay(registration.status).color"
+                    >
+                      {{ getRegistrationStatusDisplay(registration.status).label }}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  (click)="onManageRegistration(registration)"
+                  class="ml-4 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  View details
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Completion -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-medium text-gray-900">Complete Your Profile</h2>
+            <span class="text-sm text-gray-500">{{ profileCompletionPercentage() }}% complete</span>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <!-- Progress Bar -->
+          <div class="mb-6">
+            <div class="bg-gray-200 rounded-full h-2">
+              <div
+                class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                [style.width.%]="profileCompletionPercentage()"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Completion Items -->
+          <div class="space-y-3">
+            <div *ngFor="let item of profileCompletionItems()" class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg
+                  *ngIf="item.completed"
+                  class="h-5 w-5 text-green-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <svg
+                  *ngIf="!item.completed"
+                  class="h-5 w-5 text-gray-300"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div class="ml-3 flex-1">
+                <p
+                  class="text-sm font-medium"
+                  [ngClass]="item.completed ? 'text-gray-900' : 'text-gray-600'"
+                >
+                  {{ item.name }}
+                </p>
+                <p class="text-xs text-gray-500">{{ item.description }}</p>
+              </div>
+              <button
+                *ngIf="!item.completed"
+                (click)="onCompleteProfileItem(item.name)"
+                class="ml-4 text-sm text-blue-600 hover:text-blue-800 font-medium"
+              >
+                Complete
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <button
+              (click)="onUpdateProfile()"
+              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Update Profile
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Registration History & Recent Activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+      <!-- Recent Registration History -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-medium text-gray-900">Recent History</h2>
+            <button
+              (click)="onViewAllRegistrations()"
+              class="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              View all
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <div *ngIf="registrationHistory().length === 0" class="text-center py-8">
+            <svg
+              class="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No history yet</h3>
+            <p class="mt-1 text-sm text-gray-500">
+              Your registration history will appear here after volunteering.
+            </p>
+          </div>
+
+          <div *ngIf="registrationHistory().length > 0" class="space-y-4">
+            <div
+              *ngFor="let registration of registrationHistory()"
+              class="border border-gray-200 rounded-lg p-4"
+            >
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <h3 class="text-sm font-medium text-gray-900">{{ registration.event.title }}</h3>
+                  <p class="mt-1 text-sm text-gray-600">
+                    {{ formatDate(registration.event.startTime) }}
+                  </p>
+                  <div class="mt-2">
+                    <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [ngClass]="getRegistrationStatusDisplay(registration.status).color"
+                    >
+                      {{ getRegistrationStatusDisplay(registration.status).label }}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  (click)="onManageRegistration(registration)"
+                  class="ml-4 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  View
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-medium text-gray-900">Recent Activity</h2>
+            <button
+              (click)="onViewAllActivity()"
+              class="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              View all
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <div *ngIf="recentActivity().length === 0" class="text-center py-8">
+            <svg
+              class="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 17h5l-5 5v-5zM4 17v5h11l-5-5H4z"
+              />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No recent activity</h3>
+            <p class="mt-1 text-sm text-gray-500">Your recent activity will appear here.</p>
+          </div>
+
+          <div *ngIf="recentActivity().length > 0" class="flow-root">
+            <ul class="-mb-8">
+              <li *ngFor="let activity of recentActivity(); let isLast = last">
+                <div class="relative pb-8">
+                  <span
+                    *ngIf="!isLast"
+                    class="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gray-200"
+                  ></span>
+                  <div class="relative flex items-start space-x-3">
+                    <div class="relative">
+                      <div
+                        class="h-10 w-10 rounded-full flex items-center justify-center ring-8 ring-white"
+                        [ngClass]="getActivityColor(activity.type) + ' bg-gray-100'"
+                      >
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div>
+                        <div class="text-sm">
+                          <span class="font-medium text-gray-900">{{ activity.title }}</span>
+                        </div>
+                        <p class="mt-0.5 text-sm text-gray-500">
+                          {{ formatDate(activity.timestamp) }}
+                        </p>
+                      </div>
+                      <div class="mt-2 text-sm text-gray-700">
+                        <p>{{ activity.description }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-8 bg-blue-50 rounded-lg p-6">
+      <h2 class="text-lg font-medium text-blue-900 mb-4">Quick Actions</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <button
+          (click)="onBrowseEvents()"
+          class="flex items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-blue-200"
+        >
+          <svg
+            class="h-8 w-8 text-blue-600 mr-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <div class="text-left">
+            <p class="font-medium text-gray-900">Browse Events</p>
+            <p class="text-sm text-gray-600">Find new opportunities</p>
+          </div>
+        </button>
+
+        <button
+          (click)="onUpdateProfile()"
+          class="flex items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-blue-200"
+        >
+          <svg
+            class="h-8 w-8 text-blue-600 mr-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            />
+          </svg>
+          <div class="text-left">
+            <p class="font-medium text-gray-900">Update Profile</p>
+            <p class="text-sm text-gray-600">Complete your information</p>
+          </div>
+        </button>
+
+        <button
+          (click)="onViewAllRegistrations()"
+          class="flex items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-blue-200"
+        >
+          <svg
+            class="h-8 w-8 text-blue-600 mr-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
+          </svg>
+          <div class="text-left">
+            <p class="font-medium text-gray-900">View History</p>
+            <p class="text-sm text-gray-600">See all registrations</p>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

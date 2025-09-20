@@ -90,12 +90,29 @@ export class ProfileService {
    * Extract error message from GraphQL error
    */
   private extractErrorMessage(error: ApolloError): string {
+    // Handle network errors specifically
+    if (error?.networkError) {
+      if ('status' in error.networkError && error.networkError.status === 0) {
+        return 'Network connection failed. Please check your internet connection and ensure the server is running.';
+      }
+      if ('statusCode' in error.networkError && error.networkError.statusCode === 401) {
+        return 'Authentication failed. Please log in again.';
+      }
+      if (error.networkError.message) {
+        return `Network error: ${error.networkError.message}`;
+      }
+      return 'Network connection failed. Please check your internet connection.';
+    }
+
+    // Handle GraphQL errors
     if (error?.graphQLErrors?.length > 0) {
-      return error.graphQLErrors[0].message;
+      const graphqlError = error.graphQLErrors[0];
+      if (graphqlError.extensions?.['code'] === 'UNAUTHENTICATED') {
+        return 'Authentication required. Please log in again.';
+      }
+      return graphqlError.message;
     }
-    if (error?.networkError?.message) {
-      return error.networkError.message;
-    }
+
     if (error?.message) {
       return error.message;
     }
@@ -121,25 +138,46 @@ export class ProfileService {
     this.setError(null);
 
     const query = userId ? GET_PROFILE : GET_MY_PROFILE;
-    const variables = userId ? { userId } : {};
+    const variables = userId ? { id: userId } : {};
 
     return this.apollo
-      .watchQuery<{ profile?: UserProfile; myProfile?: UserProfile }>({
+      .watchQuery<{ user?: any; me?: any }>({
         query,
         variables,
         fetchPolicy: 'cache-first',
+        errorPolicy: 'all',
       })
       .valueChanges.pipe(
         map((result) => {
-          const profile = result.data?.profile || result.data?.myProfile;
-          if (profile) {
+          // Check for errors first
+          if (result.errors?.length) {
+            throw new Error(result.errors[0].message);
+          }
+
+          const userData = result.data?.user || result.data?.me;
+          if (userData) {
+            // Transform the User data to UserProfile format
+            const profile: UserProfile = {
+              id: userData.id,
+              userId: userData.id,
+              bio: userData.bio || '',
+              skills: userData.skills || [],
+              availability: undefined, // User type doesn't have availability field in current schema
+              preferences: undefined, // User type doesn't have preferences field in current schema
+              contactInfo: undefined, // User type doesn't have contactInfo field in current schema
+              emergencyContact: undefined, // User type doesn't have emergencyContact field in current schema
+              createdAt: new Date(userData.createdAt || userData.joinedAt),
+              updatedAt: new Date(userData.updatedAt || userData.lastActiveAt),
+            };
             this.setProfile(profile);
             return profile;
           }
           throw new Error('Profile not found');
         }),
         catchError((error) => {
-          this.setError(this.extractErrorMessage(error));
+          const errorMessage = this.extractErrorMessage(error);
+          this.setError(errorMessage);
+          console.error('Profile loading error:', error);
           return throwError(() => error);
         }),
         tap(() => this.setLoading(false))

@@ -17,9 +17,9 @@ export interface UserProfile {
   userId: string;
   bio?: string;
   skills: Skill[];
-  availability: Availability;
-  preferences: UserPreferences;
-  contactInfo: ContactInfo;
+  availability?: Availability;
+  preferences?: UserPreferences;
+  contactInfo?: ContactInfo;
   emergencyContact?: EmergencyContact;
   createdAt: Date;
   updatedAt: Date;

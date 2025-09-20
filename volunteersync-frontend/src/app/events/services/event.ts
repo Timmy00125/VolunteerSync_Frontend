@@ -364,6 +364,36 @@ export class EventService {
   }
 
   /**
+   * Get events organized by a specific user
+   */
+  getOrganizerEvents(organizerId: string): Observable<Event[]> {
+    this.setLoading(true);
+    this.setError(null);
+
+    return this.apollo
+      .watchQuery<{ myEvents: EventConnection }>({
+        query: GET_MY_EVENTS,
+        variables: { organizerId },
+        fetchPolicy: 'cache-first',
+      })
+      .valueChanges.pipe(
+        map((result) => {
+          if (result.data?.myEvents) {
+            const events = result.data.myEvents.edges.map((edge) => edge.node);
+            this.setEvents(events);
+            return events;
+          }
+          return [];
+        }),
+        catchError((error) => {
+          this.setError(this.extractErrorMessage(error));
+          return throwError(() => error);
+        }),
+        tap(() => this.setLoading(false))
+      );
+  }
+
+  /**
    * Create new event
    */
   createEvent(input: CreateEventInput): Observable<Event> {

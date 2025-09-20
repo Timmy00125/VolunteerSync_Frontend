@@ -66,8 +66,15 @@ export class ProfileViewComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    // Get current user
-    this.currentUser.set(this.authService.currentUser());
+    // Check authentication first
+    const currentUser = this.authService.currentUser();
+    if (!currentUser) {
+      console.warn('No authenticated user found, redirecting to login');
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    this.currentUser.set(currentUser);
 
     // Get user ID from route params (optional - if not provided, shows own profile)
     this.route.params.subscribe((params) => {
@@ -77,6 +84,12 @@ export class ProfileViewComponent implements OnInit {
   }
 
   loadProfile(): void {
+    // Ensure we have authentication before loading profile
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
     this.loading.set(true);
     const targetUserId = this.userId() || undefined;
 
@@ -88,11 +101,28 @@ export class ProfileViewComponent implements OnInit {
       error: (error) => {
         console.error('Error loading profile:', error);
         this.loading.set(false);
+
+        // Handle authentication errors specifically
+        if (
+          error?.networkError?.status === 401 ||
+          error?.graphQLErrors?.some((e: any) => e.extensions?.['code'] === 'UNAUTHENTICATED')
+        ) {
+          console.warn('Authentication failed, redirecting to login');
+          this.authService.logout();
+          this.router.navigate(['/auth/login']);
+        }
       },
     });
   }
 
   formatSkillCategory(category: SkillCategory): string {
     return category.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+  }
+
+  /**
+   * Navigate to login page
+   */
+  goToLogin(): void {
+    this.router.navigate(['/auth/login']);
   }
 }

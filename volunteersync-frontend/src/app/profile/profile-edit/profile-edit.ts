@@ -198,9 +198,10 @@ export class ProfileEditComponent implements OnInit {
         emailNotifications: formValue.emailNotifications,
         smsNotifications: formValue.smsNotifications,
         maxTravelDistance: formValue.maxTravelDistance,
-        eventTypes: currentProfile.preferences.eventTypes, // Assuming these are not editable in this form
+        eventTypes: currentProfile.preferences?.eventTypes || [], // Handle undefined preferences
         reminderPreferences: {
-          enabled: formValue.eventReminders || formValue.deadlineReminders || formValue.weeklyDigest,
+          enabled:
+            formValue.eventReminders || formValue.deadlineReminders || formValue.weeklyDigest,
           hours: [24, 48], // Example, make this configurable if needed
           methods: [NotificationMethod.EMAIL], // Example
         },
