@@ -90,10 +90,33 @@ export class ProfileViewComponent implements OnInit {
       return;
     }
 
-    this.loading.set(true);
-    const targetUserId = this.userId() || undefined;
+    const currentUser = this.currentUser();
+    const targetUserId = this.userId();
 
-    this.profileService.getProfile(targetUserId).subscribe({
+    // If viewing own profile and we have user data from auth, use it as fallback
+    if (!targetUserId && currentUser) {
+      // Create a profile from the current user data
+      const fallbackProfile: UserProfile = {
+        id: currentUser.id,
+        userId: currentUser.id,
+        bio: currentUser.bio || '',
+        skills: currentUser.skills || [],
+        availability: undefined,
+        preferences: undefined,
+        contactInfo: undefined,
+        emergencyContact: undefined,
+        createdAt: new Date(currentUser.createdAt || currentUser.joinedAt),
+        updatedAt: new Date(currentUser.updatedAt || currentUser.lastActiveAt || Date.now()),
+      };
+
+      // Set the fallback immediately
+      this.profile.set(fallbackProfile);
+      console.log('Using cached user data as fallback profile');
+    }
+
+    this.loading.set(true);
+
+    this.profileService.getProfile(targetUserId || undefined).subscribe({
       next: (profile) => {
         this.profile.set(profile);
         this.loading.set(false);
@@ -110,6 +133,15 @@ export class ProfileViewComponent implements OnInit {
           console.warn('Authentication failed, redirecting to login');
           this.authService.logout();
           this.router.navigate(['/auth/login']);
+          return;
+        }
+
+        // If it's a network error and we're viewing our own profile and have fallback data, don't show error
+        if (error?.networkError && !targetUserId && this.profile() !== null) {
+          console.warn(
+            'Network error occurred but using cached profile data. Backend may be unavailable.'
+          );
+          // Don't clear the profile or show error - we already have fallback data
         }
       },
     });
