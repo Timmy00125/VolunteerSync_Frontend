@@ -32,7 +32,7 @@
     "@angular/platform-browser": "^20.2.0",
     "@angular/platform-server": "^20.2.0",
     "@angular/router": "^20.2.0",
-    "@angular/ssr": "^20.2.1",
+    "@angular/ssr": "^20.3.6",
     "@apollo/client": "^3.0.0",
     "@tailwindcss/postcss": "^4.1.12",
     "angular-oauth2-oidc": "^20.0.2",
